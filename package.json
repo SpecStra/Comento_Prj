@@ -4,20 +4,21 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --exec babel-node src/server.js"
+    "start": "nodemon --exec babel-node src/init/server.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SpecStra/2109_Store.git"
+    "url": "git+https://github.com/SpecStra/Comento_Prj.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/SpecStra/2109_Store/issues"
+    "url": "https://github.com/SpecStra/Comento_Prj/issues"
   },
-  "homepage": "https://github.com/SpecStra/2109_Store#readme",
+  "homepage": "https://github.com/SpecStra/Comento_Prj#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "pug": "^3.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.14.6",
