@@ -5,9 +5,9 @@ mixin company(companyInfo)
                 input(type="checkbox")
             td #{companyInfo.name}
             td #{companyInfo.code}
-            td
+            td.multiple_td
                 each cate in companyInfo.category
-                    h5 #{cate}
-            td #{companyInfo.sales}
+                    span ▪ #{cate}
+            td #{companyInfo.sales.toLocaleString("ko-KR")}
             td
                 a(href=`/data/${companyInfo.code}`) ->
