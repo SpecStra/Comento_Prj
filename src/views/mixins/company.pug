@@ -1,0 +1,13 @@
+mixin company(companyInfo)
+    tbody
+        tr
+            td
+                input(type="checkbox")
+            td #{companyInfo.name}
+            td #{companyInfo.code}
+            td
+                each cate in companyInfo.category
+                    h5 #{cate}
+            td #{companyInfo.sales}
+            td
+                a(href=`/data/${companyInfo.code}`) ->

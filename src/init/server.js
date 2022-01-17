@@ -7,10 +7,10 @@ const PORT = 5000
 
 const app = express()
 
-const handleHome = () => console.log("HOme, sir")
-
+app.set("view engine", "pug")
+app.set("views", process.cwd() + "/src/views")
 app.use("/", rootRouter)
-app.use("/users", userRouter)
+app.use("/user", userRouter)
 app.use("/data", dataRouter)
 
 const handleServerListening = () => {
