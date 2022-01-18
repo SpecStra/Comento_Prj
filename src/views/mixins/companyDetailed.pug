@@ -1,0 +1,16 @@
+mixin companyDetailed(companyInfo)
+    div.detailed_top
+        div.detailed_name
+            div.detailed_text #{companyInfo.name}
+        div.detailed_code
+            div.detailed_text #{companyInfo.code}
+        div.detailed_cate
+            each cate in companyInfo.category
+                div.detailed_text ▪ #{cate}
+        div.detailed_sales
+            div.detailed_text #{companyInfo.sales}
+        div.detailed_button_container
+            a(href=`/data/${companyInfo.code}/edit`)
+                button.detailed_button Edit
+            a(href=`/data/${companyInfo.code}/delete`)
+                button.detailed_button Delete

@@ -16,3 +16,35 @@ nav {
   align-items: self-start;
   flex-direction: column;
 }
+
+.detailed_top{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 40vw;
+  height: 40vh;
+  border: 2px solid darkolivegreen;
+
+  .detailed_name{
+    width: 20px;
+    border: 1px solid red;
+  }
+  .detailed_code{
+    border: 1px solid orange;
+  }
+  .detailed_cate{
+    border: 1px solid pink;
+  }
+  .detailed_sales{
+    border: 1px solid deeppink;
+  }
+
+  .detailed_button_container{
+    background-color: red;
+  }
+  .detailed_button{
+    width: 10%;
+    height: 15%;
+  }
+}

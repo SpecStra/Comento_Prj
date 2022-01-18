@@ -1,0 +1,9 @@
+extends base/base
+
+block content
+    form
+        input(name="name" placeholder="name" value=detailed.name)
+        input(name="code" placeholder="code" value=detailed.code readonly)
+        input(name="category" placeholder="category" value=detailed.category.join())
+        input(name="sales" placeholder="sales" value=detailed.sales)
+        button(type="submit") Submit

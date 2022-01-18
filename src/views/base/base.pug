@@ -8,4 +8,6 @@ html(lang="en")
     body
         include header.pug
         main
+            if message
+                h1 ※ #{message}
             block content
