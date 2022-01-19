@@ -26,20 +26,6 @@ nav {
   height: 40vh;
   border: 2px solid darkolivegreen;
 
-  .detailed_name{
-    width: 20px;
-    border: 1px solid red;
-  }
-  .detailed_code{
-    border: 1px solid orange;
-  }
-  .detailed_cate{
-    border: 1px solid pink;
-  }
-  .detailed_sales{
-    border: 1px solid deeppink;
-  }
-
   .detailed_button_container{
     background-color: red;
   }
@@ -47,4 +33,15 @@ nav {
     width: 10%;
     height: 15%;
   }
+}
+
+.redBox{
+  width: 80px;
+  color: #f47070;
+  font-weight: 600;
+}
+.blueBox{
+  width: 80px;
+  color : #276cf7;
+  font-weight: 600;
 }

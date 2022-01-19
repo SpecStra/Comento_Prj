@@ -1,16 +1,29 @@
 mixin companyDetailed(companyInfo)
     div.detailed_top
         div.detailed_name
+            div.detailed_text_small #{companyInfo.registerCode}
             div.detailed_text #{companyInfo.name}
-        div.detailed_code
-            div.detailed_text #{companyInfo.code}
         div.detailed_cate
-            each cate in companyInfo.category
-                div.detailed_text ▪ #{cate}
+            div.detailed_text_small #{companyInfo.categoryCode}
+            div.detailed_text #{companyInfo.category}
         div.detailed_sales
             div.detailed_text #{companyInfo.sales}
+
+        div.detailed_private
+            div.detailed_text #{companyInfo.isPrivate ? "개인" : "법인"}
+        div.detailed_post
+            div.detailed_text #{companyInfo.postcode}
+        div.detailed_date
+            div.detailed_text #{companyInfo.createdAt}
+        div.detailed_files
+            ul
+                each att_file in companyInfo.attach
+                    li.detailed_text #{att_file}
+
         div.detailed_button_container
-            a(href=`/data/${companyInfo.code}/edit`)
+            a(href=`/data/${ companyInfo.registerCode }/attach`)
+                button.detailed_button Add Attachment File
+            a(href=`/data/${companyInfo.registerCode}/edit`)
                 button.detailed_button Edit
-            a(href=`/data/${companyInfo.code}/delete`)
+            a(href=`/data/${companyInfo.registerCode}/delete`)
                 button.detailed_button Delete

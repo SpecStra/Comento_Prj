@@ -1,26 +1,66 @@
 export const dataFrame = [
     {
         name : "서방",
-        code : "0055WE",
-        category : ["낙농제품 및 식용 빙과류 제조업", "곡물 가공품 제조업"],
-        sales : 17000000
+        registerCode : "211814",
+        category : "포장용 플라스틱 성형용기 제조업",
+        sales : 17700000,
+        categoryCode : "252901",
+        isPrivate : true,
+        postcode : "84217",
+        createdAt : "Date",
+        pastSales : {
+            last_quarter : 13200000,
+            sec_quarter : 20000000,
+            trd_quarter : 34000000
+        },
+        attach : ["1", "2"],
     },
     {
         name : "동방",
-        code : "0072EA",
-        category : ["자동차 차체 및 트레일러 제조업", "자동차용 기타 신품 부품 제조업", "자동차용 엔진 제조업"],
-        sales : 27800000
+        registerCode : "104811",
+        category : "미장 타일 및 방수 공사업",
+        sales : 27800000,
+        categoryCode : "452101",
+        isPrivate : true,
+        postcode : "34821",
+        createdAt : "Date",
+        pastSales : {
+            last_quarter : 16000000,
+            sec_quarter : 20000000,
+            trd_quarter : 34000000
+        },
+        attach : ["1", "2"],
     },
     {
         name : "남방",
-        code : "0012SO",
-        category : ["섬유, 직물 및 의복 액세서리 소매업", "의복 소매업", "가전제품 소매업"],
-        sales : 36000000
+        registerCode : "102812",
+        category : "잡지 및 정기 간행물 발행업",
+        sales : 36000000,
+        categoryCode : "221200",
+        isPrivate : true,
+        postcode : "78614",
+        createdAt : "Date",
+        pastSales : {
+            last_quarter : 16000000,
+            sec_quarter : 20000000,
+            trd_quarter : 34000000
+        },
+        attach : ["1", "2"],
     },
     {
         name : "북방",
-        code : "0062NO",
-        category : ["컴퓨터 및 주변장치, 소프트웨어 및 통신기기 소매업", " 전기용품 및 조명장치 소매업"],
-        sales : 29500000
+        registerCode : "202814",
+        category : "내륙 수상 여객 및 화물 운송업",
+        sales : 10000000,
+        categoryCode : "612000",
+        isPrivate : true,
+        postcode : "23790",
+        createdAt : "Date",
+        pastSales : {
+            last_quarter : 12400000,
+            sec_quarter : 20000000,
+            trd_quarter : 34000000
+        },
+        attach : ["1", "2"],
     },
 ]

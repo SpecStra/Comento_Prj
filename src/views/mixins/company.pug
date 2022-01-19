@@ -1,13 +1,17 @@
 mixin company(companyInfo)
+
     tbody
         tr
             td
                 input(type="checkbox")
             td #{companyInfo.name}
-            td #{companyInfo.code}
-            td.multiple_td
-                each cate in companyInfo.category
-                    span ▪ #{cate}
-            td #{companyInfo.sales.toLocaleString("ko-KR")}
+            td #{companyInfo.registerCode}
+            td ▫ #{companyInfo.category}
             td
-                a(href=`/data/${companyInfo.code}`) ->
+                div #{companyInfo.sales.toLocaleString( "ko-KR" )}
+                if(companyInfo.sales > companyInfo.pastSales.last_quarter)
+                    div.redBox + #{(companyInfo.sales/companyInfo.pastSales.last_quarter*50).toFixed(2)} %
+                else
+                    div.blueBox - #{(companyInfo.sales/companyInfo.pastSales.last_quarter*50).toFixed(2)} %
+            td
+                a(href=`/data/${companyInfo.registerCode}`) ->
