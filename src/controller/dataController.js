@@ -1,31 +1,139 @@
-import {dataFrame} from "../model/fakeDB"
+import Company from "../model/Company";
 
-export const getData = (req, res) => {
-    res.render("data", {dataFrame})
-}
-
-export const getDataDetails = (req, res) => {
-    const {id} = req.params
-    const detailed = dataFrame.find(src => src.registerCode === id)
-    if(!detailed){
-        res.redirect("/data")
+const privateValidate = (src) => {
+    if(src === "0"){
+        return true
+    } else if (src === "1"){
+        return false
+    } else {
+        return "err"
     }
-    res.render("dataDetail", {detailed})
 }
 
-export const getDataEdit = (req, res) => {
+export const getData = async (req, res) => {
+    try {
+        const companies = await Company.find({})
+        return res.render("data", {dataFrame : companies})
+    } catch (e) {
+        console.log(e)
+        return res.status(400).render("data", {message : e})
+    }
+}
+
+export const getDataDetails = async (req, res) => {
     const {id} = req.params
-    const detailed = dataFrame.find(src => src.registerCode === id)
-    res.render("edit", {detailed})
+    try {
+        const detailed = await Company.findOne({registerCode : id})
+        if(!detailed){
+            res.redirect("/data")
+        }
+        return res.render("dataDetail", {detailed})
+    } catch (e) {
+        console.log(e)
+        return res.status(400).render("data", {message : e})
+    }
+
 }
 
-export const getDataDelete = (req, res) => {
+export const getDataAdd = (req, res) => {
+    res.render("dataAdd")
+}
+
+export const postDataAdd = async (req, res) => {
+    const {name,
+        registerCode,
+        category,
+        sales,
+        categoryCode,
+        isPrivate,
+        postcode,
+        last_quarter,
+        sec_quarter,
+        trd_quarter,
+        attach} = req.body
+    const nowDate = new Date
+    try {
+        await Company.create({
+            name,
+            registerCode,
+            category,
+            sales : Number(sales),
+            categoryCode,
+            isPrivate : privateValidate(isPrivate),
+            postcode,
+            createdAt : `${nowDate.getFullYear()}년 ${nowDate.getMonth()+1}월 ${nowDate.getDate()}일`,
+            pastSales : {
+                last_quarter : Number(last_quarter),
+                sec_quarter : Number(sec_quarter),
+                trd_quarter : Number(trd_quarter)
+            },
+            attach
+        })
+        res.redirect("/data")
+    } catch (e) {
+        // console.log(e)
+        return res.status(400).render("dataAdd", {message : e})
+    }
+}
+
+export const getDataEdit = async (req, res) => {
+    const {id} = req.params
+    try{
+        const detailed = await Company.findOne({registerCode : id})
+        return res.render("edit", {detailed})
+    } catch (e) {
+        const detailed = await Company.findOne({registerCode : id})
+        return res.render("edit", {detailed, message : e})
+    }
+    //const detailed = dataFrame.find(src => src.registerCode === id)
+}
+
+export const postDataEdit = async (req, res) => {
+    const {name,
+        registerCode,
+        category,
+        sales,
+        categoryCode,
+        isPrivate,
+        postcode,
+        createdAt,
+        last_quarter,
+        sec_quarter,
+        trd_quarter,
+        attach} = req.body
+    try{
+      await Company.findOneAndUpdate({registerCode}, {
+          name,
+          registerCode,
+          category,
+          sales : Number(sales),
+          categoryCode,
+          isPrivate : privateValidate(isPrivate),
+          postcode,
+          createdAt,
+          pastSales : {
+              last_quarter : Number(last_quarter),
+              sec_quarter : Number(sec_quarter),
+              trd_quarter : Number(trd_quarter)
+          },
+          attach
+      })
+      return res.redirect(`/data/${registerCode}`)
+    } catch (e) {
+        const detailed = await Company.findOne({registerCode})
+        return res.render("edit", {detailed, message : e})
+    }
+}
+
+export const getDataDelete = async (req, res) => {
     const {id} = req.params
     if (!id){
         res.redirect("/data")
     }
-    // message는 나중에 세션으로 처리할 것.
-    const message = `someone make attempt to delete : ${id}`
-    console.log(message)
-    res.status(401).redirect("/")
+    try{
+        await Company.findOneAndDelete({registerCode : id})
+        return res.redirect("/data")
+    } catch (e) {
+        return res.status(500).redirect(`/data/${id}`, {message : e})
+    }
 }

@@ -1,4 +1,4 @@
-export const dataFrame = [
+export let dataFrame = [
     {
         name : "서방",
         registerCode : "211814",
@@ -13,7 +13,7 @@ export const dataFrame = [
             sec_quarter : 20000000,
             trd_quarter : 34000000
         },
-        attach : ["1", "2"],
+        attach : "1",
     },
     {
         name : "동방",
@@ -29,7 +29,7 @@ export const dataFrame = [
             sec_quarter : 20000000,
             trd_quarter : 34000000
         },
-        attach : ["1", "2"],
+        attach : "1",
     },
     {
         name : "남방",
@@ -45,7 +45,7 @@ export const dataFrame = [
             sec_quarter : 20000000,
             trd_quarter : 34000000
         },
-        attach : ["1", "2"],
+        attach : "1",
     },
     {
         name : "북방",
@@ -61,6 +61,6 @@ export const dataFrame = [
             sec_quarter : 20000000,
             trd_quarter : 34000000
         },
-        attach : ["1", "2"],
+        attach : "1",
     },
 ]

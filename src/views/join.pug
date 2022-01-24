@@ -1,4 +1,9 @@
 extends base/base
 
 block content
-    h1 join
+    form(method="POST")
+        input(name="username" placeholder="ID" type="text" value="toJoin" required)
+        input(name="password" placeholder="Password" type="password" value="wantJoin" required)
+        input(type="submit", value="Save")
+    div.oath_box
+        a(href="/login") Sign In
