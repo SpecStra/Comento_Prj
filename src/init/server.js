@@ -1,4 +1,5 @@
 import express from "express"
+import session from "express-session"
 import rootRouter from "../router/rootRouter";
 import userRouter from "../router/userRouter";
 import dataRouter from "../router/dataRouter";
@@ -6,6 +7,8 @@ import morgan from "morgan";
 import bodyParser from "body-parser";
 import "./db"
 import "../model/Company"
+import "../model/User"
+import {localWare} from "./sessionCatcher";
 
 const PORT = 5000
 
@@ -17,6 +20,13 @@ app.set("views", process.cwd() + "/src/views")
 //app.use(logger)
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json())
+
+app.use(session({
+    secret : "He",
+    resave : true,
+    saveUninitialized : true
+}))
+app.use(localWare)
 
 app.use("/", rootRouter)
 app.use("/user", userRouter)

@@ -13,30 +13,36 @@ const privateValidate = (src) => {
 export const getData = async (req, res) => {
     try {
         const companies = await Company.find({})
-        return res.render("data", {dataFrame : companies})
+        return res.render("data", {dataFrame : companies, pageTitle : "Data"})
     } catch (e) {
         console.log(e)
-        return res.status(400).render("data", {message : e})
+        return res.status(400).render("data", {message : e, pageTitle : "Data"})
     }
 }
 
 export const getDataDetails = async (req, res) => {
     const {id} = req.params
+    if(!res.locals.loggedIn){
+        return res.status(401).render("login", {message : "authority required : need user authority", pageTitle : "Login"})
+    }
     try {
         const detailed = await Company.findOne({registerCode : id})
         if(!detailed){
             res.redirect("/data")
         }
-        return res.render("dataDetail", {detailed})
+        return res.render("dataDetail", {detailed, pageTitle : `${id}`})
     } catch (e) {
         console.log(e)
-        return res.status(400).render("data", {message : e})
+        return res.status(400).render("data", {message : e, pageTitle : "Data"})
     }
 
 }
 
 export const getDataAdd = (req, res) => {
-    res.render("dataAdd")
+    if(!res.locals.loggedIn){
+        return res.status(401).render("login", {message : "authority required : need user authority", pageTitle : "Login"})
+    }
+    return res.render("dataAdd", {pageTitle : "Data Add"})
 }
 
 export const postDataAdd = async (req, res) => {
@@ -72,7 +78,7 @@ export const postDataAdd = async (req, res) => {
         res.redirect("/data")
     } catch (e) {
         // console.log(e)
-        return res.status(400).render("dataAdd", {message : e})
+        return res.status(400).render("dataAdd", {message : e, pageTitle : "Data Add"})
     }
 }
 
@@ -80,10 +86,10 @@ export const getDataEdit = async (req, res) => {
     const {id} = req.params
     try{
         const detailed = await Company.findOne({registerCode : id})
-        return res.render("edit", {detailed})
+        return res.render("edit", {detailed, pageTitle : `Edit ${id}`})
     } catch (e) {
         const detailed = await Company.findOne({registerCode : id})
-        return res.render("edit", {detailed, message : e})
+        return res.render("edit", {detailed, message : e, pageTitle : `Edit ${id}`})
     }
     //const detailed = dataFrame.find(src => src.registerCode === id)
 }
@@ -121,7 +127,7 @@ export const postDataEdit = async (req, res) => {
       return res.redirect(`/data/${registerCode}`)
     } catch (e) {
         const detailed = await Company.findOne({registerCode})
-        return res.render("edit", {detailed, message : e})
+        return res.render("edit", {detailed, message : e, pageTitle : `Edit`})
     }
 }
 

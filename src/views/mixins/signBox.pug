@@ -1,0 +1,17 @@
+mixin signBox(signType)
+    form(method="POST")
+        div ID
+            input(name="username" type="text" value="" required)
+        div Password
+            input(name="password" type="password" value="" required)
+        if(signType === "Sign On")
+            div Password Re-Check
+                input(name="passwordRecheck" type="password" value="" required)
+            div Code
+                input(name="signCode" value="" required)
+        input(type="submit" value=`${ signType }`)
+    div.sign_box
+        div.sing_box_child
+            a(href="/login") Log in
+        div.sing_box_child
+            a(href="/join") Sign On

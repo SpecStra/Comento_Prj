@@ -7,11 +7,13 @@ header
         ul
             li
                 a(href="/") Home
-            li
-                a(href="/login") Log In
-            li
-                a(href="/join") Join
-            li
-                a(href="/user") User
+            if(!loggedIn)
+                li
+                    a(href="/login") Log In
+                li
+                    a(href="/join") Join
+            else
+                li
+                    a(href="/logout") Log Out
             li
                 a(href="/data") Data

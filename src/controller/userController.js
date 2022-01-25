@@ -1,3 +1,3 @@
 export const getUser = (req, res) => {
-    res.render("user")
+    res.render("user", {pageTitle : "User"})
 }

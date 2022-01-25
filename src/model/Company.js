@@ -19,7 +19,7 @@ const valiContainer = {
     ValidatePrivate : {
         message : "사업자 형태 구분 입력 시 개인은 0, 법인은 1로 입력해주세요.",
         validator : (v) => {
-            return /[0|1]|[true|false]/.test(v);
+            return /[0|1]/.test(v);
         }
     },
 }
