@@ -1,3 +1,5 @@
+import multer from "multer";
+
 export const localWare = (req, res, next) => {
     // console.log("req SESSION : ",req.session)
     // console.log("res SESSION : ",res.locals)
@@ -9,3 +11,8 @@ export const localWare = (req, res, next) => {
     }
     next()
 }
+
+export const uploadWare = multer({
+    dest : "uploads/",
+
+})

@@ -38,7 +38,10 @@ const companySchema = new mongoose.Schema({
         sec_quarter : {type : Number},
         trd_quarter : {type : Number},
     },
-    attach : {type : String},
+    attach : {
+        path : {type : String},
+        name : {type : String}
+    },
 })
 
 const Company =mongoose.model("Company", companySchema)

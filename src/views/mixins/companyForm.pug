@@ -1,5 +1,5 @@
 mixin companyForm(detailed)
-    form(method="POST")
+    form(method="POST" enctype="multipart/form-data")
         div 사업장명
             input(name="name" type="text" required value=`${detailed ? detailed.name : ""}`)
         div 사업장등록번호
@@ -23,6 +23,7 @@ mixin companyForm(detailed)
         div 3분기 이전 매출액
             input(name="trd_quarter" type="text" required value=`${detailed ? detailed.pastSales.trd_quarter : ""}`)
         div 첨부파일
-            input(name="attach" type="text" value=`${detailed ? detailed.attach : ""}`)
+            label(for="attach")
+            input(name="attach" type="file" accept=".csv, .pdf, .txt, .hwp")
 
         input(type="submit", value=`${detailed ? "Edit" : "Submit"}`)

@@ -73,7 +73,10 @@ export const postDataAdd = async (req, res) => {
                 sec_quarter : Number(sec_quarter),
                 trd_quarter : Number(trd_quarter)
             },
-            attach
+            attach : {
+                path : req.file ? req.file.path : "",
+                name : req.file ? req.file.originalname : ""
+            }
         })
         res.redirect("/data")
     } catch (e) {
@@ -95,6 +98,7 @@ export const getDataEdit = async (req, res) => {
 }
 
 export const postDataEdit = async (req, res) => {
+    const {id} = req.params
     const {name,
         registerCode,
         category,
@@ -106,7 +110,8 @@ export const postDataEdit = async (req, res) => {
         last_quarter,
         sec_quarter,
         trd_quarter,
-        attach} = req.body
+        } = req.body
+    const prevData = await Company.findOne({registerCode})
     try{
       await Company.findOneAndUpdate({registerCode}, {
           name,
@@ -122,9 +127,13 @@ export const postDataEdit = async (req, res) => {
               sec_quarter : Number(sec_quarter),
               trd_quarter : Number(trd_quarter)
           },
-          attach
+          attach : {
+              path : req.file ? req.file.path : prevData.attach.path,
+              name : req.file ? req.file.originalname : prevData.attach.name
+          }
       })
-      return res.redirect(`/data/${registerCode}`)
+      console.log(req.file)
+      return res.status(200).redirect(`/data/${registerCode}`)
     } catch (e) {
         const detailed = await Company.findOne({registerCode})
         return res.render("edit", {detailed, message : e, pageTitle : `Edit`})
@@ -141,5 +150,15 @@ export const getDataDelete = async (req, res) => {
         return res.redirect("/data")
     } catch (e) {
         return res.status(500).redirect(`/data/${id}`, {message : e})
+    }
+}
+
+export const getDataDownload = async (req, res) => {
+    const {file_path} = req.params
+    const searched = await Company.findOne({"attach.path" : `uploads\\${file_path}`})
+    try{
+        return res.download(`./uploads/${file_path}`, `${searched.attach.name}`)
+    } catch (e) {
+        return res.render(`/data/${searched.registerCode}`, {message : e})
     }
 }

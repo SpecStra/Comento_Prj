@@ -17,12 +17,10 @@ mixin companyDetailed(companyInfo)
             div.detailed_text #{companyInfo.createdAt}
         div.detailed_files
             ul
-                each att_file in companyInfo.attach
-                    li.detailed_text #{att_file}
+                a(href=`${companyInfo.attach.path}`)
+                    li.detailed_text #{companyInfo.attach.name}
 
         div.detailed_button_container
-            a(href=`/data/${ companyInfo.registerCode }/attach`)
-                button.detailed_button Add Attachment File
             a(href=`/data/${companyInfo.registerCode}/edit`)
                 button.detailed_button Edit
             a(href=`/data/${companyInfo.registerCode}/delete`)
