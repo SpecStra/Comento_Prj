@@ -1,11 +1,14 @@
 import express from "express"
 import {
+    getAttachDelete,
     getData,
-    getDataDetails,
-    getDataDelete,
-    getDataEdit,
     getDataAdd,
-    postDataAdd, postDataEdit, getDataDownload
+    getDataDelete,
+    getDataDetails,
+    getDataDownload,
+    getDataEdit,
+    postDataAdd,
+    postDataEdit
 } from "../controller/dataController";
 import {uploadWare} from "../init/sessionCatcher";
 
@@ -17,5 +20,6 @@ dataRouter.get("/:id([0-9]{6})", getDataDetails)
 dataRouter.route("/:id([0-9]{6})/edit").get(getDataEdit).post(uploadWare.single("attach"), postDataEdit)
 dataRouter.get("/:id([0-9]{6})/delete", getDataDelete)
 dataRouter.route("/uploads/:file_path([0-9:a-z]{32})").get(getDataDownload)
+dataRouter.route("/uploads/:file_path([0-9:a-z]{32})/delete").get(getAttachDelete)
 
 export default dataRouter

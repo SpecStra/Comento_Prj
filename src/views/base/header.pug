@@ -1,9 +1,11 @@
 block style
     style
-        include ../style/global.scss
+        include ../style/styles.scss
 
 header
     nav
+        if(currentUser)
+            h4 #{currentUser} on duty
         ul
             li
                 a(href="/") Home

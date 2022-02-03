@@ -30,7 +30,7 @@ const companySchema = new mongoose.Schema({
     category : {type : String, required : true, trim : true},
     sales : {type : Number, required : true},
     categoryCode : {type : String, required : true, trim : true, validate : {validator : valiContainer.ValidateCode.validator, message : valiContainer.ValidateCode.message.category}},
-    isPrivate : {type : Boolean, required : true, validate : {validator : valiContainer.ValidatePrivate.validator, message : valiContainer.ValidatePrivate.message}},
+    isPrivate : {type : Boolean, required : true},
     postcode : {type : String, required : true, trim : true, validate : {validator : valiContainer.ValidatePost.validator, message : valiContainer.ValidatePost.message}},
     createdAt : {type : String, required : true},
     pastSales : {

@@ -9,9 +9,10 @@ mixin company(companyInfo)
             td ▫ #{companyInfo.category}
             td
                 div #{companyInfo.sales.toLocaleString( "ko-KR" )}
-                if(companyInfo.sales > companyInfo.pastSales.last_quarter)
-                    div.redBox + #{(companyInfo.sales/companyInfo.pastSales.last_quarter*50).toFixed(2)} %
-                else
-                    div.blueBox - #{(companyInfo.sales/companyInfo.pastSales.last_quarter*50).toFixed(2)} %
+                if(companyInfo.pastSales.last_quarter !== 0)
+                    if(companyInfo.sales > companyInfo.pastSales.last_quarter)
+                        div.redBox + #{(companyInfo.sales/companyInfo.pastSales.last_quarter*50).toFixed(2)} %
+                    else
+                        div.blueBox - #{(companyInfo.sales/companyInfo.pastSales.last_quarter*50).toFixed(2)} %
             td
                 a(href=`/data/${companyInfo.registerCode}`) ->

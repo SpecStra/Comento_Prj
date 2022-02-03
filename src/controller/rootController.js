@@ -1,13 +1,16 @@
 import User from "../model/User";
 import bcrypt from "bcrypt";
-import dotenv from "dotenv"
 
 export const getHome = (req, res) => {
     res.render("home", {pageTitle : "Home"})
 }
 
 export const getLogin = (req, res) => {
-    res.render("login", {pageTitle : "Login"})
+    if(res.locals.loggedIn){
+        return res.status(200).redirect("/")
+    }
+    req.session.userAuthFail = false
+    return res.render("login", {pageTitle : "Login"})
 }
 
 export const postLogin = async (req, res) => {
@@ -22,7 +25,7 @@ export const postLogin = async (req, res) => {
     }
     req.session.loggedIn = true
     req.session.currentUser = user
-    return res.redirect("/")
+    return res.status(200).redirect("/")
 }
 
 export const getJoin = (req, res) => {

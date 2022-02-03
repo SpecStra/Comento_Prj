@@ -1,27 +1,52 @@
 mixin companyDetailed(companyInfo)
     div.detailed_top
-        div.detailed_name
-            div.detailed_text_small #{companyInfo.registerCode}
-            div.detailed_text #{companyInfo.name}
-        div.detailed_cate
-            div.detailed_text_small #{companyInfo.categoryCode}
-            div.detailed_text #{companyInfo.category}
-        div.detailed_sales
-            div.detailed_text #{companyInfo.sales}
+        div.detailed_lefttop
+            div.detailed_name
+                div.detailed_text_small 사업자등록번호 : #{companyInfo.registerCode}
+                div.detailed_text (주) #{companyInfo.name} | #{companyInfo.isPrivate ? "개인" : "법인"}
+            div.detailed_name
+                div.detailed_text_small 사업장형태구분코드 : #{companyInfo.categoryCode}
+                div.detailed_text #{companyInfo.category}
 
-        div.detailed_private
-            div.detailed_text #{companyInfo.isPrivate ? "개인" : "법인"}
-        div.detailed_post
-            div.detailed_text #{companyInfo.postcode}
-        div.detailed_date
-            div.detailed_text #{companyInfo.createdAt}
-        div.detailed_files
-            ul
-                a(href=`${companyInfo.attach.path}`)
-                    li.detailed_text #{companyInfo.attach.name}
+        div.detailed_righttop
+            div.detailed_sales
+                div.detailed_text_small 매출액
+                div.detailed_text #{companyInfo.sales.toLocaleString( "ko-KR" )}
+                if(companyInfo.pastSales.last_quarter !== 0)
+                    if(companyInfo.sales > companyInfo.pastSales.last_quarter)
+                        div.redBox + #{(companyInfo.sales / companyInfo.pastSales.last_quarter * 50).toFixed( 2 )} %
+                    else
+                        div.blueBox - #{(companyInfo.sales / companyInfo.pastSales.last_quarter * 50).toFixed( 2 )} %
+                details.detailed_detailsTag
+                    summary 지난 분기 매출액
+                    div.detailed_text_small 1분기 전 매출액
+                    div.detailed_text #{companyInfo ? companyInfo.pastSales.last_quarter.toLocaleString( "ko-KR" ) : "해당 정보 없음"}
+                    div.detailed_text_small 2분기 전 매출액
+                    div.detailed_text #{companyInfo ? companyInfo.pastSales.sec_quarter.toLocaleString( "ko-KR" ) : "해당 정보 없음"}
+                    div.detailed_text_small 3분기 전 매출액
+                    div.detailed_text #{companyInfo ? companyInfo.pastSales.trd_quarter.toLocaleString( "ko-KR" ) : "해당 정보 없음"}
+            div.detailed_post
+                div.detailed_text_small 우편번호
+                div.detailed_text #{companyInfo.postcode}
+            div.detailed_date
+                div.detailed_text_small 데이터 생성일자
+                div.detailed_text #{companyInfo.createdAt}
 
-        div.detailed_button_container
-            a(href=`/data/${companyInfo.registerCode}/edit`)
-                button.detailed_button Edit
-            a(href=`/data/${companyInfo.registerCode}/delete`)
-                button.detailed_button Delete
+        div.detailed_leftbot
+            div.detailed_button_container
+                a(href=`/data/${ companyInfo.registerCode }/edit`)
+                    button.detailed_button Edit
+                a(href=`/data/${ companyInfo.registerCode }/delete`)
+                    button.detailed_button Delete
+
+        div.detailed_rightbot
+            div.detailed_text_small 첨부파일
+            if(detailed.attach.name)
+                div.detailed_files
+                    ul
+                        a(href=`${companyInfo.attach.path}`)
+                            li.detailed_text #{companyInfo.attach.name}
+                    a(href=`/data/${ companyInfo.attach.path }/delete`)
+                        button.detailed_files_delete 첨부파일 삭제
+            else
+                h3 * 첨부파일 없음

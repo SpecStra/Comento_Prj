@@ -1,4 +1,5 @@
 import Company from "../model/Company";
+import * as fs from "fs";
 
 const privateValidate = (src) => {
     if(src === "0"){
@@ -23,7 +24,8 @@ export const getData = async (req, res) => {
 export const getDataDetails = async (req, res) => {
     const {id} = req.params
     if(!res.locals.loggedIn){
-        return res.status(401).render("login", {message : "authority required : need user authority", pageTitle : "Login"})
+        req.session.userAuthFail = true
+        return res.status(200).redirect("/login")
     }
     try {
         const detailed = await Company.findOne({registerCode : id})
@@ -40,7 +42,8 @@ export const getDataDetails = async (req, res) => {
 
 export const getDataAdd = (req, res) => {
     if(!res.locals.loggedIn){
-        return res.status(401).render("login", {message : "authority required : need user authority", pageTitle : "Login"})
+        req.session.userAuthFail = true
+        return res.status(200).redirect("/login")
     }
     return res.render("dataAdd", {pageTitle : "Data Add"})
 }
@@ -78,7 +81,7 @@ export const postDataAdd = async (req, res) => {
                 name : req.file ? req.file.originalname : ""
             }
         })
-        res.redirect("/data")
+        return res.redirect("/data")
     } catch (e) {
         // console.log(e)
         return res.status(400).render("dataAdd", {message : e, pageTitle : "Data Add"})
@@ -86,6 +89,10 @@ export const postDataAdd = async (req, res) => {
 }
 
 export const getDataEdit = async (req, res) => {
+    if(!res.locals.loggedIn){
+        req.session.userAuthFail = true
+        return res.status(200).redirect("/login")
+    }
     const {id} = req.params
     try{
         const detailed = await Company.findOne({registerCode : id})
@@ -132,7 +139,7 @@ export const postDataEdit = async (req, res) => {
               name : req.file ? req.file.originalname : prevData.attach.name
           }
       })
-      console.log(req.file)
+      // console.log(req.file)
       return res.status(200).redirect(`/data/${registerCode}`)
     } catch (e) {
         const detailed = await Company.findOne({registerCode})
@@ -141,12 +148,21 @@ export const postDataEdit = async (req, res) => {
 }
 
 export const getDataDelete = async (req, res) => {
+    if(!res.locals.loggedIn){
+        req.session.userAuthFail = true
+        return res.status(200).redirect("/login")
+    }
     const {id} = req.params
     if (!id){
         res.redirect("/data")
     }
+    const prevData = await Company.findOne({registerCode : id})
+    const prevAttachPath = prevData.attach.path.replace("\\", "/")
     try{
         await Company.findOneAndDelete({registerCode : id})
+        if(prevAttachPath !== ""){
+            return res.redirect(`/data/${prevAttachPath}/delete`)
+        }
         return res.redirect("/data")
     } catch (e) {
         return res.status(500).redirect(`/data/${id}`, {message : e})
@@ -154,6 +170,10 @@ export const getDataDelete = async (req, res) => {
 }
 
 export const getDataDownload = async (req, res) => {
+    if(!res.locals.loggedIn){
+        req.session.userAuthFail = true
+        return res.status(200).redirect("/login")
+    }
     const {file_path} = req.params
     const searched = await Company.findOne({"attach.path" : `uploads\\${file_path}`})
     try{
@@ -161,4 +181,28 @@ export const getDataDownload = async (req, res) => {
     } catch (e) {
         return res.render(`/data/${searched.registerCode}`, {message : e})
     }
+}
+
+export const getAttachDelete = async (req, res) => {
+    if(!res.locals.loggedIn){
+        req.session.userAuthFail = true
+        return res.status(200).redirect("/login")
+    }
+    const {file_path} = req.params
+    try {
+        await fs.unlinkSync(`uploads\\${file_path}`)
+    } catch (e) {
+        return res.status(500).redirect("/data")
+    }
+    try{
+        await Company.findOneAndUpdate({"attach.path" : `uploads\\${file_path}`}, {
+            attach : {
+                path : "",
+                name : ""
+            }
+        })
+    } catch (e) {
+        return res.status(500).redirect("/data")
+    }
+    return res.status(200).redirect(`/data`)
 }
