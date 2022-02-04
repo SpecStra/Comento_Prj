@@ -1,0 +1,36 @@
+mixin pages(page, queryString)
+    ul.pageUls
+        if(page - 4 > 0)
+            a(href=`/data/pages/${ page - 4 }/${queryString ? `${queryString}` : ""}`)
+                li.those_pages #{page - 4}
+        if(page - 3 > 0)
+            a(href=`/data/pages/${ page - 3 }/${queryString ? `${queryString}` : ""}`)
+                li.those_pages #{page - 3}
+        if(page - 2 > 0)
+            a(href=`/data/pages/${ page - 2 }/${queryString ? `${queryString}` : ""}`)
+                li.those_pages #{page - 2}
+        if(page - 1 > 0)
+            a(href=`/data/pages/${ page - 1 }/${queryString ? `${queryString}` : ""}`)
+                li.those_pages #{page - 1}
+
+        li.those_pages #{page}
+
+        if(page + 1 <= lastPage)
+            a(href=`/data/pages/${ page + 1 }/${queryString ? `${queryString}` : ""}`)
+                li.those_pages #{page + 1}
+        if(page + 2 < lastPage)
+            a(href=`/data/pages/${ page + 2 }/${queryString ? `${queryString}` : ""}`)
+                li.those_pages #{page + 2}
+        if(page + 3 < lastPage)
+            a(href=`/data/pages/${ page + 3 }/${queryString ? `${queryString}` : ""}`)
+                li.those_pages #{page + 3}
+        if(page + 4 < lastPage)
+            a(href=`/data/pages/${ page + 4 }/${queryString ? `${queryString}` : ""}`)
+                li.those_pages #{page + 4}
+
+        if(page <= lastPage - 5)
+            li.those_pages ..
+
+        if(page !== lastPage && lastPage !== 0)
+            a(href=`/data/pages/${ lastPage }/${queryString ? `${queryString}` : ""}`)
+                li.those_pages_last #{lastPage}

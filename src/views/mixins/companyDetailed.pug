@@ -14,9 +14,9 @@ mixin companyDetailed(companyInfo)
                 div.detailed_text #{companyInfo.sales.toLocaleString( "ko-KR" )}
                 if(companyInfo.pastSales.last_quarter !== 0)
                     if(companyInfo.sales > companyInfo.pastSales.last_quarter)
-                        div.redBox + #{(companyInfo.sales / companyInfo.pastSales.last_quarter * 50).toFixed( 2 )} %
+                        div.redBox + #{((companyInfo.sales/companyInfo.pastSales.last_quarter - 1) * 100).toFixed(2)} %
                     else
-                        div.blueBox - #{(companyInfo.sales / companyInfo.pastSales.last_quarter * 50).toFixed( 2 )} %
+                        div.blueBox #{((companyInfo.sales/companyInfo.pastSales.last_quarter - 1) * 100).toFixed(2)} %
                 details.detailed_detailsTag
                     summary 지난 분기 매출액
                     div.detailed_text_small 1분기 전 매출액

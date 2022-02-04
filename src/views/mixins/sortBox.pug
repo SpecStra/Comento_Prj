@@ -1,0 +1,32 @@
+mixin sortBox(pickQuery)
+    if(pickQuery)
+        if(pickQuery.sort && !pickQuery.allSort)
+            a(href=`./`)
+                button 데이터 정렬 해제
+            a(href=`./?allSort=asc&sort=${ pickQuery.sort }`)
+                button 전체 데이터 정렬
+            a(href=`./?sort=${ pickQuery.sort === "asc" ? "desc" : "asc" }`)
+                button 현재 페이지 #{pickQuery.sort === "asc" ? "내림차순" : "오름차순"} 정렬
+        if(!pickQuery.sort && pickQuery.allSort)
+            a(href=`./`)
+                button 데이터 정렬 해제
+            a(href=`./?allSort=${ pickQuery.allSort === "asc" ? "desc" : "asc" }`)
+                button 전체 데이터 #{pickQuery.allSort === "asc" ? "내림차순" : "오름차순"} 정렬
+            a(href=`./?allSort=${ pickQuery.allSort === "asc" ? "desc" : "asc" }&sort=${ pickQuery.sort === "asc" ? "desc" : "asc" }`)
+                button 현재 페이지 #{pickQuery.sort === "asc" ? "내림차순" : "오름차순"} 정렬
+        if(pickQuery.sort && pickQuery.allSort)
+            a(href=`./`)
+                button 데이터 정렬 해제
+            a(href=`./?allSort=${ pickQuery.allSort === "asc" ? "desc" : "asc" }&sort=${ pickQuery.sort === "asc" ? "desc" : "asc" }`)
+                button 전체 데이터 #{pickQuery.allSort === "asc" ? "오름차순" : "내림차순"} 정렬
+            a(href=`./?allSort=${ pickQuery.allSort === "asc" ? "desc" : "asc" }&sort=${ pickQuery.sort === "asc" ? "desc" : "asc" }`)
+                button 현재 페이지 #{pickQuery.sort === "asc" ? "내림차순" : "오름차순"} 정렬
+    else
+        a(href=`./?allSort=asc`)
+            button 전체 데이터 오름차순 정렬
+        a(href=`./?allSort=desc`)
+            button 전체 데이터 내림차순 정렬
+        a(href=`./?sort=asc`)
+            button 현재 페이지 오름차순
+        a(href=`./?sort=desc`)
+            button 현재 페이지 내림차순

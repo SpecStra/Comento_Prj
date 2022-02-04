@@ -21,6 +21,50 @@ export const getData = async (req, res) => {
     }
 }
 
+export const getDataPage = async (req, res) => {
+    const page = req.params.page ? req.params.page : 1
+    const pickQuery = req.query ? req.query : null
+    const viewRate = 10
+    try{
+        if(!pickQuery.sort && !pickQuery.allSort){
+            const companies = await Company.find({}).skip((page-1)*viewRate).limit(viewRate)
+            const lastPage = Math.floor(await Company.count({})/viewRate)
+            return res.render("data", {dataFrame : companies, pageTitle : `Data - Page ${page}`, page : Number(page), lastPage})
+
+        } else if(pickQuery.sort && !pickQuery.allSort) {
+            const companies = await Company.find({}).skip((page-1)*viewRate).limit(viewRate)
+            if(pickQuery.sort === "asc"){
+                companies.sort((a,b) => a.sales > b.sales ? 1 : -1)
+            } else if (pickQuery.sort === "desc"){
+                companies.sort((a,b) => a.sales > b.sales ? -1 : 1)
+            }
+            const lastPage = Math.floor(await Company.count({})/viewRate)
+            const queryString = `?sort=${pickQuery.sort}`
+            return res.render("data", {dataFrame : companies, pageTitle : `Data - Page ${page}`, page : Number(page), lastPage, pickQuery, queryString})
+
+        } else if(!pickQuery.sort && pickQuery.allSort){
+            const companies = await Company.find({}).skip((page-1)*viewRate).limit(viewRate).sort({sales : "asc"})
+            const lastPage = Math.floor(await Company.count({})/viewRate)
+            const queryString = `?allSort=${pickQuery.allSort}`
+            return res.render("data", {dataFrame : companies, pageTitle : `Data - Page ${page}`, page : Number(page), lastPage, pickQuery, queryString})
+
+        } else if(pickQuery.sort && pickQuery.allSort){
+            const companies = await Company.find({}).skip((page-1)*viewRate).limit(viewRate).sort({sales : "asc"})
+            if(pickQuery.sort === "asc"){
+                companies.sort((a,b) => a.sales > b.sales ? 1 : -1)
+            } else if (pickQuery.sort === "desc"){
+                companies.sort((a,b) => a.sales > b.sales ? -1 : 1)
+            }
+            const lastPage = Math.floor(await Company.count({})/viewRate)
+            const queryString = `?allSort=${pickQuery.allSort}&sort=${pickQuery.sort}`
+            return res.render("data", {dataFrame : companies, pageTitle : `Data - Page ${page}`, page : Number(page), lastPage, pickQuery, queryString})
+
+        }
+    } catch (e) {
+        return res.redirect("/")
+    }
+}
+
 export const getDataDetails = async (req, res) => {
     const {id} = req.params
     if(!res.locals.loggedIn){

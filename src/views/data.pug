@@ -1,5 +1,7 @@
 extends base/base
 include mixins/company
+include mixins/pages
+include mixins/sortBox
 
 block content
     if (dataFrame[0])
@@ -21,5 +23,12 @@ block content
                     li There's something wrong in data, sorry;
     else
         h2 there is no data;
+    if(page)
+        div.pageContainer
+            +pages(page, queryString)
+
+
     div.oath_box
         a(href="/data/add") Add Data
+    div.sort_box
+        +sortBox(pickQuery)
