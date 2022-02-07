@@ -16,8 +16,8 @@ import {uploadWare} from "../init/sessionCatcher";
 const dataRouter = express.Router()
 
 dataRouter.get("/", getData)
-dataRouter.get("/pages/:page([0-9]{1,2})", getDataPage)
-dataRouter.get("/pages/:page([0-9]{1,2}/:mode)", getDataPage)
+dataRouter.get("/pages/:page([0-9]{1,3})", getDataPage)
+dataRouter.get("/pages/:page([0-9]{1,3}/:mode)", getDataPage)
 dataRouter.route("/add").get(getDataAdd).post(uploadWare.single("attach"), postDataAdd)
 dataRouter.get("/:id([0-9]{6})", getDataDetails)
 dataRouter.route("/:id([0-9]{6})/edit").get(getDataEdit).post(uploadWare.single("attach"), postDataEdit)

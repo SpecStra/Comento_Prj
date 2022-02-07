@@ -34,7 +34,7 @@ mixin companyDetailed(companyInfo)
 
         div.detailed_leftbot
             div.detailed_button_container
-                a(href=`/data/${ companyInfo.registerCode }/edit`)
+                //a(href=`/data/${ companyInfo.registerCode }/edit`)
                     button.detailed_button Edit
                 a(href=`/data/${ companyInfo.registerCode }/delete`)
                     button.detailed_button Delete
@@ -46,7 +46,7 @@ mixin companyDetailed(companyInfo)
                     ul
                         a(href=`${companyInfo.attach.path}`)
                             li.detailed_text #{companyInfo.attach.name}
-                    a(href=`/data/${ companyInfo.attach.path }/delete`)
+                    //a(href=`/data/${ companyInfo.attach.path }/delete`)
                         button.detailed_files_delete 첨부파일 삭제
             else
                 h3 * 첨부파일 없음

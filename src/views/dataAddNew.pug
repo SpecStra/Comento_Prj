@@ -1,0 +1,13 @@
+extends base/base
+
+block content
+    form(method="POST" enctype="multipart/form-data")
+        if(detailed)
+            div 현재 첨부파일 : #{detailed.attach.name ? detailed.attach.name : "없음"}
+        else
+            div 첨부파일
+        div
+            label(for="attach")
+            input(name="attach" type="file" accept=".csv, .xlsx")
+
+        input(type="submit", value=`${ detailed ? "Edit" : "Submit" }`)

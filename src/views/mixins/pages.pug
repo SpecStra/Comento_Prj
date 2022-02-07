@@ -1,5 +1,11 @@
 mixin pages(page, queryString)
     ul.pageUls
+
+        if(page > 5)
+            a(href=`/data/pages/1/${queryString ? `${queryString}` : ""}`)
+                li.those_pages 1
+            li.those_pages ..
+
         if(page - 4 > 0)
             a(href=`/data/pages/${ page - 4 }/${queryString ? `${queryString}` : ""}`)
                 li.those_pages #{page - 4}
@@ -15,7 +21,7 @@ mixin pages(page, queryString)
 
         li.those_pages #{page}
 
-        if(page + 1 <= lastPage)
+        if(page + 1 < lastPage)
             a(href=`/data/pages/${ page + 1 }/${queryString ? `${queryString}` : ""}`)
                 li.those_pages #{page + 1}
         if(page + 2 < lastPage)

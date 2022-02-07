@@ -1,5 +1,6 @@
 import Company from "../model/Company";
 import * as fs from "fs";
+import * as xlsx from "xlsx";
 
 const privateValidate = (src) => {
     if(src === "0"){
@@ -24,11 +25,12 @@ export const getData = async (req, res) => {
 export const getDataPage = async (req, res) => {
     const page = req.params.page ? req.params.page : 1
     const pickQuery = req.query ? req.query : null
-    const viewRate = 10
+    const viewRate = 50
+    const countOfData = await Company.count({})
+    const lastPage = countOfData%viewRate === 0 ? countOfData/viewRate : Math.ceil(countOfData/viewRate)
     try{
         if(!pickQuery.sort && !pickQuery.allSort){
             const companies = await Company.find({}).skip((page-1)*viewRate).limit(viewRate)
-            const lastPage = Math.floor(await Company.count({})/viewRate)
             return res.render("data", {dataFrame : companies, pageTitle : `Data - Page ${page}`, page : Number(page), lastPage})
 
         } else if(pickQuery.sort && !pickQuery.allSort) {
@@ -38,24 +40,21 @@ export const getDataPage = async (req, res) => {
             } else if (pickQuery.sort === "desc"){
                 companies.sort((a,b) => a.sales > b.sales ? -1 : 1)
             }
-            const lastPage = Math.floor(await Company.count({})/viewRate)
             const queryString = `?sort=${pickQuery.sort}`
             return res.render("data", {dataFrame : companies, pageTitle : `Data - Page ${page}`, page : Number(page), lastPage, pickQuery, queryString})
 
         } else if(!pickQuery.sort && pickQuery.allSort){
-            const companies = await Company.find({}).skip((page-1)*viewRate).limit(viewRate).sort({sales : "asc"})
-            const lastPage = Math.floor(await Company.count({})/viewRate)
+            const companies = await Company.find({}).skip((page-1)*viewRate).limit(viewRate).sort({sales : `${pickQuery.allSort}`})
             const queryString = `?allSort=${pickQuery.allSort}`
             return res.render("data", {dataFrame : companies, pageTitle : `Data - Page ${page}`, page : Number(page), lastPage, pickQuery, queryString})
 
         } else if(pickQuery.sort && pickQuery.allSort){
-            const companies = await Company.find({}).skip((page-1)*viewRate).limit(viewRate).sort({sales : "asc"})
+            const companies = await Company.find({}).skip((page-1)*viewRate).limit(viewRate).sort({sales : `${pickQuery.allSort}`})
             if(pickQuery.sort === "asc"){
                 companies.sort((a,b) => a.sales > b.sales ? 1 : -1)
             } else if (pickQuery.sort === "desc"){
                 companies.sort((a,b) => a.sales > b.sales ? -1 : 1)
             }
-            const lastPage = Math.floor(await Company.count({})/viewRate)
             const queryString = `?allSort=${pickQuery.allSort}&sort=${pickQuery.sort}`
             return res.render("data", {dataFrame : companies, pageTitle : `Data - Page ${page}`, page : Number(page), lastPage, pickQuery, queryString})
 
@@ -85,14 +84,41 @@ export const getDataDetails = async (req, res) => {
 }
 
 export const getDataAdd = (req, res) => {
+    /* 임시허용
     if(!res.locals.loggedIn){
         req.session.userAuthFail = true
         return res.status(200).redirect("/login")
     }
-    return res.render("dataAdd", {pageTitle : "Data Add"})
+     */
+    return res.render("dataAddNew", {pageTitle : "Data Add"})
 }
 
 export const postDataAdd = async (req, res) => {
+    const file = req.file
+    const nowDate = new Date
+    try{
+        const obj = await xlsx.readFile(`./uploads/${file.filename}`)
+        const newCompany = await Company.create({
+            name : obj.Sheets["Sheet 1"].A2.v,
+            registerCode : obj.Sheets["Sheet 1"].B2.v,
+            category : obj.Sheets["Sheet 1"].C2.v,
+            sales : Number(obj.Sheets["Sheet 1"].D2.v),
+            categoryCode : obj.Sheets["Sheet 1"].E2.v,
+            isPrivate : Boolean(obj.Sheets["Sheet 1"].F2.v),
+            postcode : obj.Sheets["Sheet 1"].G2.v,
+            createdAt : `${nowDate.getFullYear()}년 ${nowDate.getMonth()+1}월 ${nowDate.getDate()}일`,
+            pastSales : {
+                last_quarter : 0,
+                sec_quarter : 0,
+                trd_quarter : 0
+            },
+            attach : {
+                path : req.file ? req.file.path : "",
+                name : req.file ? req.file.originalname : ""
+            }
+        })
+        return res.redirect(`/data/${newCompany.registerCode}`)
+    /*
     const {name,
         registerCode,
         category,
@@ -106,7 +132,7 @@ export const postDataAdd = async (req, res) => {
         attach} = req.body
     const nowDate = new Date
     try {
-        await Company.create({
+        const newCompany = await Company.create({
             name,
             registerCode,
             category,
@@ -125,7 +151,9 @@ export const postDataAdd = async (req, res) => {
                 name : req.file ? req.file.originalname : ""
             }
         })
-        return res.redirect("/data")
+        return res.redirect(`/data/${newCompany.registerCode}`)
+        */
+        return res.redirect(`/data/pages/1/`)
     } catch (e) {
         // console.log(e)
         return res.status(400).render("dataAdd", {message : e, pageTitle : "Data Add"})
@@ -198,7 +226,7 @@ export const getDataDelete = async (req, res) => {
     }
     const {id} = req.params
     if (!id){
-        res.redirect("/data")
+        return res.redirect("/data/pages/1/")
     }
     const prevData = await Company.findOne({registerCode : id})
     const prevAttachPath = prevData.attach.path.replace("\\", "/")
@@ -207,7 +235,7 @@ export const getDataDelete = async (req, res) => {
         if(prevAttachPath !== ""){
             return res.redirect(`/data/${prevAttachPath}/delete`)
         }
-        return res.redirect("/data")
+        return res.redirect(`/data/pages/1/`)
     } catch (e) {
         return res.status(500).redirect(`/data/${id}`, {message : e})
     }
@@ -236,17 +264,17 @@ export const getAttachDelete = async (req, res) => {
     try {
         await fs.unlinkSync(`uploads\\${file_path}`)
     } catch (e) {
-        return res.status(500).redirect("/data")
+        return res.status(500).redirect("/data/pages/1/")
     }
     try{
-        await Company.findOneAndUpdate({"attach.path" : `uploads\\${file_path}`}, {
+        const updatedData = await Company.findOneAndUpdate({"attach.path" : `uploads\\${file_path}`}, {
             attach : {
                 path : "",
                 name : ""
             }
         })
+        return res.status(200).redirect(`/data/${updatedData.registerCode}`)
     } catch (e) {
-        return res.status(500).redirect("/data")
+        return res.status(500).redirect("/data/pages/1/")
     }
-    return res.status(200).redirect(`/data`)
 }

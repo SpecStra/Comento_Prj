@@ -1,6 +1,6 @@
 mixin companyForm(detailed)
     form(method="POST" enctype="multipart/form-data")
-        h2 *은 필수 입력사항입니다.
+        h2 You must write * section to submit data form.
         div 사업장명 *
             input(name="name" type="text" required value=`${detailed ? detailed.name : ""}`)
         div 사업장등록번호 *
@@ -25,6 +25,8 @@ mixin companyForm(detailed)
             input(name="trd_quarter" type="text" value=`${detailed ? detailed.pastSales.trd_quarter : ""}`)
         if(detailed)
             div 현재 첨부파일 : #{detailed.attach.name ? detailed.attach.name : "없음"}
+        else
+            div 첨부파일
         div
             label(for="attach")
             input(name="attach" type="file" accept=".csv, .pdf, .txt, .hwp")

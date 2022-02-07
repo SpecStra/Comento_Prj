@@ -2,7 +2,8 @@ import User from "../model/User";
 import bcrypt from "bcrypt";
 
 export const getHome = (req, res) => {
-    res.render("home", {pageTitle : "Home"})
+    //console.log(req.session)
+    return res.render("home")
 }
 
 export const getLogin = (req, res) => {

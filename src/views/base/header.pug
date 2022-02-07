@@ -1,9 +1,18 @@
+- var firstPage = 1
+
 block style
     style
-        include ../style/styles.scss
+        include ../style/styles.css
 
-header
-    nav
+nav.sidebar
+    header
+        div.image_text
+            span.image_span
+                img(src="../style/logo.png" alt="logo")
+
+
+
+
         if(currentUser)
             h4 #{currentUser} on duty
         ul
@@ -18,4 +27,4 @@ header
                 li
                     a(href="/logout") Log Out
             li
-                a(href="/data") Data
+                a(href=`/data/pages/${firstPage}/`) Data
