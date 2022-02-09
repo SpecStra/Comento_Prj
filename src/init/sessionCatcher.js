@@ -7,6 +7,8 @@ export const localWare = (req, res, next) => {
     if(req.session.loggedIn){
         res.locals.loggedIn = req.session.loggedIn
         res.locals.currentUser = req.session.currentUser.username
+        res.locals.userType = req.session.currentUser.userType
+        res.locals.userRegiCode = req.session.currentUser.registerCode
     } else {
         res.locals.loggedIn = false
     }

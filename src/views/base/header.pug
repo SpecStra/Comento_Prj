@@ -8,23 +8,54 @@ nav.sidebar
     header
         div.image_text
             span.image_span
-                img(src="../style/logo.png" alt="logo")
+                img.image_span_logo(src="https://github.com/SpecStra/Comento_Prj/blob/main/src/views/style/logo.png?raw=true" alt="logo")
+            div.text_header_text
+                span.text_header_text_name Project
+                span.text_header_text_prof Showing Up
 
 
 
-
-        if(currentUser)
-            h4 #{currentUser} on duty
-        ul
-            li
-                a(href="/") Home
-            if(!loggedIn)
-                li
-                    a(href="/login") Log In
-                li
-                    a(href="/join") Join
+    if(currentUser)
+        div.current_user
+            if(userType === "Admin")
+                h5.detailed_text_small Admin
             else
-                li
-                    a(href="/logout") Log Out
-            li
-                a(href=`/data/pages/${firstPage}/`) Data
+                h5.detailed_text_small #{userType} : #{userRegiCode}
+            h4 #{currentUser} on duty
+
+
+    div.menubar
+        div.menubar_menu
+            ul.menu_ul
+                //li.menu_list
+                    i(class="bx bx-search icon")
+                        input(class="menu_list_text" type="search" placeholder="사업장등록번호로 검색")
+                li.menu_list
+                    a(href="/")
+                        i(class="bx bx-home icon")
+                        span.menu_list_text Home
+                if(!loggedIn)
+                    li.menu_list
+                        a(href="/login")
+                            i(class="bx bx-log-in icon")
+                            span.menu_list_text Login
+                    li.menu_list
+                        a(href="/join")
+                            i(class="bx bx-user-check icon")
+                            span.menu_list_text Join
+                else
+                    li.menu_list
+                        a(href="/logout")
+                            i(class="bx bx-log-out icon")
+                            span.menu_list_text Logout
+
+                if(userType === "Workshop")
+                    li.menu_list
+                        a(href=`/data/pages/${firstPage}/`)
+                            i(class="bx bx-data icon")
+                            span.menu_list_text Data
+                else
+                    li.menu_list
+                        a(href=`/data/pages/${ firstPage }/`)
+                            i(class="bx bx-data icon")
+                            span.menu_list_text Data

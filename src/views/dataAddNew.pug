@@ -1,13 +1,20 @@
 extends base/base
 
 block content
-    form(method="POST" enctype="multipart/form-data")
+    form(method="POST" enctype="multipart/form-data" class="file_add_form")
         if(detailed)
-            div 현재 첨부파일 : #{detailed.attach.name ? detailed.attach.name : "없음"}
+            div.form_text_container
+                div.fomr_text_bigtext Edit File
+            div.form_text_container
+                div.form_text_smalltext Current File
+                div.form_text_smalltext #{detailed.attach.name ? detailed.attach.name : "없음"}
         else
-            div 첨부파일
-        div
-            label(for="attach")
-            input(name="attach" type="file" accept=".csv, .xlsx")
+            div.form_text_container
+                div.form_text_smalltext To enroll workplace, upload xlsx file.
 
-        input(type="submit", value=`${ detailed ? "Edit" : "Submit" }`)
+        div.form_attach
+            div.form_attach_attachCont
+                label.form_attach_label(for="attach")
+                input(name="attach" type="file" accept=".csv, .xlsx" class="form_attach_input")
+
+            input(type="submit", value=`${ detailed ? "Edit" : "Submit" }` class="form_submit")

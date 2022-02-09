@@ -29,25 +29,67 @@ export const postLogin = async (req, res) => {
     return res.status(200).redirect("/")
 }
 
-export const getJoin = (req, res) => {
-    res.render("join", {pageTitle : "Join"})
+export const getJoinGate = (req, res) => {
+    return res.render("joinGate", {pageTitle : "Join"})
+}
+
+export const getJoin = async (req, res) => {
+    return res.render("join", {pageTitle : "Join", currentCompany : null, joinType : "company"})
 }
 
 export const postJoin = async (req, res) => {
     const {username, password, passwordRecheck, signCode} = req.body
-    const searchedUser = await User.findOne({username})
-    if(signCode !== process.env.SIGN_CODE){
-        return res.status(400).render("join", {message : "Wrong Code", pageTitle : "Join"})
-    }
-    if(searchedUser){
+    const searchedName = await User.findOne({username})
+    if(searchedName){
         return res.status(400).render("join", {message : "that name is already exist", pageTitle : "Join"})
+    }
+    const searchedCode = await User.findOne({registerCode : signCode})
+    if(searchedCode){
+        return res.status(400).render("join", {message : "that Business registration number is already exist", pageTitle : "Join"})
     }
     if(password !== passwordRecheck){
         return res.status(400).render("join", {message : "passwords are not same", pageTitle : "Join"})
     }
     await User.create({
         username,
-        password
+        password,
+        registerCode : signCode,
+        upperCompany : "Admin",
+        userType : "Company"
+    })
+    return res.redirect("/login")
+}
+
+export const getJoinWorkshop = async (req, res) => {
+    const currentCompany = await User.find({upperCompany : "Admin"})
+    const dataLength = Object.keys(currentCompany).length
+    const users = []
+    for (const i of Array(dataLength).keys()) {
+        users.push(currentCompany[i].username)
+    }
+    return res.render("join", {pageTitle : "Join", currentCompany : users, joinType : "workshop"})
+}
+
+export const postJoinWorkshop = async (req, res) => {
+    const {username, password, passwordRecheck, signCode, upperChoice} = req.body
+    const searchedName = await User.findOne({username})
+    if(searchedName){
+        return res.status(400).render("join", {message : "that name is already exist", pageTitle : "Join"})
+    }
+    const searchedCode = await User.findOne({registerCode : signCode})
+    if(searchedCode){
+        return res.status(400).render("join", {message : "that Business registration number is already exist", pageTitle : "Join"})
+    }
+    if(password !== passwordRecheck){
+        return res.status(400).render("join", {message : "passwords are not same", pageTitle : "Join"})
+    }
+    const upperUser = await User.findOne({username : upperChoice})
+    await User.create({
+        username,
+        password,
+        registerCode : signCode,
+        upperCompany : upperUser.registerCode,
+        userType : "Workshop"
     })
     return res.redirect("/login")
 }

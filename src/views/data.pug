@@ -14,8 +14,8 @@ block content
                         th 사업장명
                         th 사업자등록번호
                         th 사업장 업종
-                        th 매출액 (원) <br>증감 비율 (%)
                         th 세부정보
+                        th 엑셀파일
 
                 each data in dataFrame
                     +company(data)
@@ -28,7 +28,7 @@ block content
             +pages(page, queryString)
 
 
-    div.oath_box
+    //div.oath_box
         a(href="/data/add") Add Data
     //div.sort_box
         +sortBox(pickQuery)

@@ -1,6 +1,7 @@
 import Company from "../model/Company";
 import * as fs from "fs";
 import * as xlsx from "xlsx";
+import User from "../model/User";
 
 const privateValidate = (src) => {
     if(src === "0"){
@@ -23,14 +24,31 @@ export const getData = async (req, res) => {
 }
 
 export const getDataPage = async (req, res) => {
+    if(!res.locals.loggedIn){
+        req.session.userAuthFail = true
+        return res.status(200).redirect("/login")
+    }
+    if(res.locals.userType === "Workshop"){
+        const hasData = await Company.findOne({registerCode : req.session.currentUser.registerCode})
+        if(!hasData){
+            return res.status(200).redirect(`/data/add`)
+        } else {
+            return res.status(200).redirect(`/data/${req.session.currentUser.registerCode}`)
+        }
+    }
     const page = req.params.page ? req.params.page : 1
     const pickQuery = req.query ? req.query : null
+    const currentUser = req.session.currentUser.username
+    const user = await User.findOne({username : currentUser})
+    //console.log(user.registerCode)
     const viewRate = 50
     const countOfData = await Company.count({})
     const lastPage = countOfData%viewRate === 0 ? countOfData/viewRate : Math.ceil(countOfData/viewRate)
     try{
         if(!pickQuery.sort && !pickQuery.allSort){
-            const companies = await Company.find({}).skip((page-1)*viewRate).limit(viewRate)
+            const regexString = user.userType === "Admin" ? "Admin," : `${user.registerCode},`
+            const regex = new RegExp(regexString, "g")
+            const companies = await Company.find({path : regex}).skip((page-1)*viewRate).limit(viewRate)
             return res.render("data", {dataFrame : companies, pageTitle : `Data - Page ${page}`, page : Number(page), lastPage})
 
         } else if(pickQuery.sort && !pickQuery.allSort) {
@@ -84,29 +102,34 @@ export const getDataDetails = async (req, res) => {
 }
 
 export const getDataAdd = (req, res) => {
-    /* 임시허용
     if(!res.locals.loggedIn){
         req.session.userAuthFail = true
         return res.status(200).redirect("/login")
     }
-     */
     return res.render("dataAddNew", {pageTitle : "Data Add"})
 }
 
 export const postDataAdd = async (req, res) => {
+    if(!res.locals.loggedIn){
+        req.session.userAuthFail = true
+        return res.status(200).redirect("/login")
+    }
     const file = req.file
     const nowDate = new Date
+    const maker = req.session.currentUser.username
     try{
+        const user = await User.findOne({username : maker})
         const obj = await xlsx.readFile(`./uploads/${file.filename}`)
         const newCompany = await Company.create({
             name : obj.Sheets["Sheet 1"].A2.v,
-            registerCode : obj.Sheets["Sheet 1"].B2.v,
+            registerCode : user.registerCode,
             category : obj.Sheets["Sheet 1"].C2.v,
             sales : Number(obj.Sheets["Sheet 1"].D2.v),
             categoryCode : obj.Sheets["Sheet 1"].E2.v,
             isPrivate : Boolean(obj.Sheets["Sheet 1"].F2.v),
             postcode : obj.Sheets["Sheet 1"].G2.v,
             createdAt : `${nowDate.getFullYear()}년 ${nowDate.getMonth()+1}월 ${nowDate.getDate()}일`,
+            path : user.upperCompany === "Admin" ? ",Admin," : `,Admin,${user.upperCompany},`,
             pastSales : {
                 last_quarter : 0,
                 sec_quarter : 0,
@@ -153,10 +176,9 @@ export const postDataAdd = async (req, res) => {
         })
         return res.redirect(`/data/${newCompany.registerCode}`)
         */
-        return res.redirect(`/data/pages/1/`)
     } catch (e) {
         // console.log(e)
-        return res.status(400).render("dataAdd", {message : e, pageTitle : "Data Add"})
+        return res.status(400).render("dataAddNew", {message : e, pageTitle : "Data Add"})
     }
 }
 

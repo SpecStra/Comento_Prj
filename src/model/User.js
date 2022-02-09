@@ -1,26 +1,13 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt"
-
-/*
-const valiContainer = {
-    validateName : {
-        message : "",
-        validator : (v) => {
-            return /[]/.test(v)
-        }
-    },
-    validatePW : {
-        message : "",
-        validator : (v) => {
-            return /[]/.test(v)
-        }
-    }
-}
- */
+import {valiContainer} from "./validator"
 
 const userSchema = new mongoose.Schema({
     username : {type : String, required : true},
-    password : {type : String, required : true}
+    password : {type : String, required : true},
+    registerCode : {type : String, required : true, trim : true, validate : {validator : valiContainer.ValidateUpCode.validator, message : valiContainer.ValidateUpCode.message.register}},
+    upperCompany : {type : String, required : true, trim : true},
+    userType : {type : String, required : true, trim : true}
 })
 
 

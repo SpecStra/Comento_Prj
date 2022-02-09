@@ -9,7 +9,10 @@ html(lang="en")
         include header.pug
         main
             if message
-                h1 ※ #{message}
+                div.message_handle
+                    h1.message_handle_text ※ #{message}
             if userAuthFail
-                h1 You have approached to page that require authentication. Please log in.
+                div.message_handle
+                    h2 You have approached to page that require authentication.
+                    h2 Please log in.
             block content

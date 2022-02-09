@@ -1,17 +1,38 @@
-mixin signBox(signType)
-    form(method="POST")
-        div ID *
-            input(name="username" type="text" value="" required minlength=2 maxlength=12)
-        div Password *
-            input(name="password" type="password" value="" required minlength=2 maxlength=16)
-        if(signType === "Sign On")
-            div Password Re-Check *
-                input(name="passwordRecheck" type="password" value="" required minlength=2 maxlength=16)
-            div Sign Code *
-                input(name="signCode" value="" required)
-        input(type="submit" value=`${ signType }`)
-    div.sign_box
-        div.sing_box_child
-            a(href="/login") Log in
-        div.sing_box_child
-            a(href="/join") Sign On
+mixin signBox(signType, currentCompany, joinType)
+    div.login
+        form.login_form(method="POST")
+            span Username
+            div.login_form_provision
+                div.login_form_text
+                    i(class="bx bx-user icon")
+                input.login_form_input(name="username" type="text" value="" required minlength=2 maxlength=12)
+            span Password
+            div.login_form_provision
+                div.login_form_text
+                    i(class="bx bx-key icon")
+                input.login_form_input(name="password" type="password" value="" required minlength=2 maxlength=16)
+            if(signType === "Sign On")
+                span Password Re-check
+                div.login_form_provision
+                    div.login_form_text
+                        i(class="bx bx-key icon")
+                    input.login_form_input(name="passwordRecheck" type="password" value="" required minlength=2 maxlength=16)
+                span Business registration number
+                div.login_form_provision
+                    div.login_form_text
+                        i(class="bx bx-code icon")
+                    input.login_form_input(name="signCode" value="" required)
+                if(joinType === "workshop")
+                    div Choice company you belong to
+                    select(name="upperChoice" class="login_form_provision")
+                        each data in currentCompany
+                            option(name=`${data}` value=`${data}`) #{data}
+            div.login_sign
+                input.login_sign_input(type="submit" value=`${ signType }`)
+        div.sign_box
+            if(signType === "Sign On")
+                div.sing_box_child
+                    a(href="/login") To Log in
+            if(signType === "Log in")
+                div.sing_box_child
+                    a(href="/join") To Sign On
