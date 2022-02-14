@@ -1,6 +1,13 @@
 import User from "../model/User";
 import bcrypt from "bcrypt";
 
+const registerCodeMutate = (src) => {
+    const b = src.split("")
+    b.splice(3, 0, "-")
+    b.splice(6, 0, "-")
+    return b.join("")
+}
+
 export const getHome = (req, res) => {
     //console.log(req.session)
     return res.render("home")

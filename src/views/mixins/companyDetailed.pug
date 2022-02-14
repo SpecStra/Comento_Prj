@@ -7,36 +7,32 @@ mixin companyDetailed(companyInfo)
             div.detailed_name
                 div.detailed_text_small 사업장형태구분코드 : #{companyInfo.categoryCode}
                 div.detailed_text #{companyInfo.category}
-
-        div.detailed_righttop
-            div.detailed_sales
-                div.detailed_text_small 매출액
-                div.detailed_text #{companyInfo.sales.toLocaleString( "ko-KR" )}
-                if(companyInfo.pastSales.last_quarter !== 0)
-                    if(companyInfo.sales > companyInfo.pastSales.last_quarter)
-                        div.redBox + #{((companyInfo.sales/companyInfo.pastSales.last_quarter - 1) * 100).toFixed(2)} %
-                    else
-                        div.blueBox #{((companyInfo.sales/companyInfo.pastSales.last_quarter - 1) * 100).toFixed(2)} %
-                details.detailed_detailsTag
-                    summary 지난 분기 매출액
-                    div.detailed_text_small 1분기 전 매출액
-                    div.detailed_text #{companyInfo ? companyInfo.pastSales.last_quarter.toLocaleString( "ko-KR" ) : "해당 정보 없음"}
-                    div.detailed_text_small 2분기 전 매출액
-                    div.detailed_text #{companyInfo ? companyInfo.pastSales.sec_quarter.toLocaleString( "ko-KR" ) : "해당 정보 없음"}
-                    div.detailed_text_small 3분기 전 매출액
-                    div.detailed_text #{companyInfo ? companyInfo.pastSales.trd_quarter.toLocaleString( "ko-KR" ) : "해당 정보 없음"}
-            div.detailed_post
+            div.detailed_name
                 div.detailed_text_small 우편번호
                 div.detailed_text #{companyInfo.postcode}
+
+        div.detailed_righttop
             div.detailed_date
-                div.detailed_text_small 데이터 생성일자
-                div.detailed_text #{companyInfo.createdAt}
+                div.detailed_text_small 기록일자
+                div.detailed_text #{companyInfo.financeInfo.recodedDate.year}년 #{companyInfo.financeInfo.recodedDate.quarter}분기
+            div.detailed_sales
+                div.detailed_text_small 매출액
+                div.detailed_text #{companyInfo.financeInfo.sales.toLocaleString( "ko-KR" )}
+            div.detailed_sales
+                div.detailed_text_small 영업이익
+                div.detailed_text #{companyInfo.financeInfo.operIncome.toLocaleString( "ko-KR" )}
+            div.detailed_sales
+                div.detailed_text_small 당기순이익
+                div.detailed_text #{companyInfo.financeInfo.netIncome.toLocaleString( "ko-KR" )}
+            div.detailed_date
+                div.detailed_text_small 최근 수정일
+                div.detailed_text #{companyInfo.modifier.date}
 
         div.detailed_leftbot
             div.detailed_button_container
-                //a(href=`/data/${ companyInfo.registerCode }/edit`)
+                a(href=`/data/${ companyInfo._id.toString() }/edit`)
                     button.detailed_button Edit
-                a(href=`/data/${ companyInfo.registerCode }/delete`)
+                a(href=`/data/${ companyInfo._id.toString() }/delete`)
                     button.detailed_button Data Delete
 
 

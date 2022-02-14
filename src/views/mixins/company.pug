@@ -5,10 +5,10 @@ mixin company(companyInfo)
             td
                 input(type="checkbox")
             td #{companyInfo.name}
-            td #{companyInfo.registerCode}
-            td ▫ #{companyInfo.category}
+            td #{companyInfo.financeInfo.recodedDate.year}
+            td #{companyInfo.financeInfo.recodedDate.quarter} Quarter
             td
-                a(href=`/data/${companyInfo.registerCode}`) ->
+                a(href=`/data/${companyInfo._id.toString()}`) ->
             td
                 a(href=`/data/${companyInfo.attach.path}`)
                     i(class="bx bx-file")

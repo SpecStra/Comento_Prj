@@ -2,16 +2,7 @@ import Company from "../model/Company";
 import * as fs from "fs";
 import * as xlsx from "xlsx";
 import User from "../model/User";
-
-const privateValidate = (src) => {
-    if(src === "0"){
-        return true
-    } else if (src === "1"){
-        return false
-    } else {
-        return "err"
-    }
-}
+import mongoose from "mongoose";
 
 export const getData = async (req, res) => {
     try {
@@ -32,8 +23,6 @@ export const getDataPage = async (req, res) => {
         const hasData = await Company.findOne({registerCode : req.session.currentUser.registerCode})
         if(!hasData){
             return res.status(200).redirect(`/data/add`)
-        } else {
-            return res.status(200).redirect(`/data/${req.session.currentUser.registerCode}`)
         }
     }
     const page = req.params.page ? req.params.page : 1
@@ -46,9 +35,10 @@ export const getDataPage = async (req, res) => {
     const lastPage = countOfData%viewRate === 0 ? countOfData/viewRate : Math.ceil(countOfData/viewRate)
     try{
         if(!pickQuery.sort && !pickQuery.allSort){
-            const regexString = user.userType === "Admin" ? "Admin," : `${user.registerCode},`
+            const regexString = user.userType === "Admin" ? "^,Admin," : user.userType === "Company" ? `,${user.registerCode},` : `,Admin,${user.upperCompany},`
             const regex = new RegExp(regexString, "g")
-            const companies = await Company.find({path : regex}).skip((page-1)*viewRate).limit(viewRate)
+            // console.log(regex)
+            const companies = await Company.find({path : regex}).skip((page-1)*viewRate).limit(viewRate).sort({name : 1, "financeInfo.recodedDate.year" : 1, "financeInfo.recodedDate.quarter" : 1})
             return res.render("data", {dataFrame : companies, pageTitle : `Data - Page ${page}`, page : Number(page), lastPage})
 
         } else if(pickQuery.sort && !pickQuery.allSort) {
@@ -83,22 +73,22 @@ export const getDataPage = async (req, res) => {
 }
 
 export const getDataDetails = async (req, res) => {
-    const {id} = req.params
+    const {objectID} = req.params
     if(!res.locals.loggedIn){
         req.session.userAuthFail = true
         return res.status(200).redirect("/login")
     }
     try {
-        const detailed = await Company.findOne({registerCode : id})
-        if(!detailed){
-            res.redirect("/data")
+        const queryId = new mongoose.Types.ObjectId(objectID)
+        const detailed = await Company.findOne({_id : queryId})
+        if(detailed === null){
+            return res.redirect("/data")
         }
-        return res.render("dataDetail", {detailed, pageTitle : `${id}`})
+        return res.render("dataDetail", {detailed, pageTitle : `Data Detailed`})
     } catch (e) {
         console.log(e)
-        return res.status(400).render("data", {message : e, pageTitle : "Data"})
+        return res.status(400).render("data", {message : e, pageTitle : `Data Detailed`})
     }
-
 }
 
 export const getDataAdd = (req, res) => {
@@ -116,19 +106,37 @@ export const postDataAdd = async (req, res) => {
     }
     const file = req.file
     const nowDate = new Date
+    const {input_year, input_quarter} = req.body
+    const check = await Company.findOne({registerCode : req.session.currentUser.registerCode, "financeInfo.recodedDate.year" : Number(input_year), "financeInfo.recodedDate.quarter" : Number(input_quarter)})
+    if(check){
+        await fs.unlinkSync(file.path)
+        return res.status(400).render("dataAddNew", {message : `${input_year}/${input_quarter} quarter Data already exist`, pageTitle : "Data Add"})
+    }
     const maker = req.session.currentUser.username
     try{
         const user = await User.findOne({username : maker})
         const obj = await xlsx.readFile(`./uploads/${file.filename}`)
+        const {Sheets : {Sheet1}} = obj
         const newCompany = await Company.create({
-            name : obj.Sheets["Sheet 1"].A2.v,
+            name : Sheet1.A2.v,
             registerCode : user.registerCode,
-            category : obj.Sheets["Sheet 1"].C2.v,
-            sales : Number(obj.Sheets["Sheet 1"].D2.v),
-            categoryCode : obj.Sheets["Sheet 1"].E2.v,
-            isPrivate : Boolean(obj.Sheets["Sheet 1"].F2.v),
-            postcode : obj.Sheets["Sheet 1"].G2.v,
-            createdAt : `${nowDate.getFullYear()}년 ${nowDate.getMonth()+1}월 ${nowDate.getDate()}일`,
+            category : Sheet1.B2.v,
+            financeInfo : {
+                sales : Number(Sheet1.F2.v),
+                operIncome : Number(Sheet1.G2.v),
+                netIncome : Number(Sheet1.H2.v),
+                recodedDate : {
+                    year : Number(input_year),
+                    quarter : Number(input_quarter),
+                }
+            },
+            categoryCode : Sheet1.C2.v,
+            isPrivate : Boolean(Sheet1.D2.v),
+            postcode : Sheet1.E2.v,
+            modifier : {
+                date : `${nowDate.getFullYear()}년 ${nowDate.getMonth()+1}월 ${nowDate.getDate()}일`,
+                user : String(maker)
+            },
             path : user.upperCompany === "Admin" ? ",Admin," : `,Admin,${user.upperCompany},`,
             pastSales : {
                 last_quarter : 0,
@@ -140,7 +148,7 @@ export const postDataAdd = async (req, res) => {
                 name : req.file ? req.file.originalname : ""
             }
         })
-        return res.redirect(`/data/${newCompany.registerCode}`)
+        return res.redirect(`/data/${newCompany._id.toString()}`)
     /*
     const {name,
         registerCode,
@@ -183,77 +191,83 @@ export const postDataAdd = async (req, res) => {
 }
 
 export const getDataEdit = async (req, res) => {
+    const {objectID} = req.params
+    const queryId = new mongoose.Types.ObjectId(objectID)
     if(!res.locals.loggedIn){
         req.session.userAuthFail = true
         return res.status(200).redirect("/login")
     }
     const {id} = req.params
     try{
-        const detailed = await Company.findOne({registerCode : id})
-        return res.render("edit", {detailed, pageTitle : `Edit ${id}`})
+        const detailed = await Company.findOne({_id : queryId})
+        return res.render("dataAddNew", {detailed, pageTitle : `Edit ${id}`})
     } catch (e) {
-        const detailed = await Company.findOne({registerCode : id})
         return res.render("edit", {detailed, message : e, pageTitle : `Edit ${id}`})
     }
     //const detailed = dataFrame.find(src => src.registerCode === id)
 }
 
 export const postDataEdit = async (req, res) => {
-    const {id} = req.params
-    const {name,
-        registerCode,
-        category,
-        sales,
-        categoryCode,
-        isPrivate,
-        postcode,
-        createdAt,
-        last_quarter,
-        sec_quarter,
-        trd_quarter,
-        } = req.body
-    const prevData = await Company.findOne({registerCode})
+    const {objectID} = req.params
+    const queryId = new mongoose.Types.ObjectId(objectID)
+    const file = req.file
+    const nowDate = new Date
+    const maker = req.session.currentUser.username
+    const user = await User.findOne({registerCode : req.session.currentUser.registerCode})
+    const prevData = await Company.findOne({_id : queryId})
     try{
-      await Company.findOneAndUpdate({registerCode}, {
-          name,
-          registerCode,
-          category,
-          sales : Number(sales),
-          categoryCode,
-          isPrivate : privateValidate(isPrivate),
-          postcode,
-          createdAt,
-          pastSales : {
-              last_quarter : Number(last_quarter),
-              sec_quarter : Number(sec_quarter),
-              trd_quarter : Number(trd_quarter)
-          },
-          attach : {
-              path : req.file ? req.file.path : prevData.attach.path,
-              name : req.file ? req.file.originalname : prevData.attach.name
-          }
-      })
-      // console.log(req.file)
-      return res.status(200).redirect(`/data/${registerCode}`)
+        const obj = await xlsx.readFile(`./uploads/${file.filename}`)
+        const {Sheets : {Sheet1}} = obj
+        await fs.unlinkSync(`${prevData.attach.path}`)
+        await Company.findOneAndUpdate({_id : queryId}, {
+            name : Sheet1.A2.v,
+            registerCode : req.session.currentUser.registerCode,
+            category : Sheet1.B2.v,
+            financeInfo : {
+                sales : Number(Sheet1.F2.v),
+                operIncome : Number(Sheet1.G2.v),
+                netIncome : Number(Sheet1.H2.v),
+                recodedDate : {
+                    year : prevData.financeInfo.recodedDate.year,
+                    quarter : prevData.financeInfo.recodedDate.quarter,
+                }
+            },
+            categoryCode : Sheet1.C2.v,
+            isPrivate : Boolean(Sheet1.D2.v),
+            postcode : Sheet1.E2.v,
+            modifier : {
+                date : `${nowDate.getFullYear()}년 ${nowDate.getMonth()+1}월 ${nowDate.getDate()}일`,
+                user : String(maker)
+            },
+            path : user.upperCompany === "Admin" ? ",Admin," : `,Admin,${user.upperCompany},`,
+            pastSales : {
+                last_quarter : 0,
+                sec_quarter : 0,
+                trd_quarter : 0
+            },
+            attach : {
+                path : req.file ? req.file.path : "",
+                name : req.file ? req.file.originalname : ""
+            }
+        })
+        return res.status(200).redirect(`/data/${objectID}`)
     } catch (e) {
-        const detailed = await Company.findOne({registerCode})
+        const detailed = await Company.findOne({_id : queryId})
         return res.render("edit", {detailed, message : e, pageTitle : `Edit`})
     }
 }
 
 export const getDataDelete = async (req, res) => {
+    const {objectID} = req.params
+    const queryId = new mongoose.Types.ObjectId(objectID)
     if(!res.locals.loggedIn){
         req.session.userAuthFail = true
         return res.status(200).redirect("/login")
     }
-    const {id} = req.params
-    if (!id){
-        return res.redirect("/data/pages/1/")
-    }
-    const prevData = await Company.findOne({registerCode : id})
+    const prevData = await Company.findOne({_id : queryId})
     const prevAttachPath = prevData.attach.path.replace("\\", "/")
     try{
-        await Company.findOneAndDelete({registerCode : id})
+        await Company.findOneAndDelete({_id : queryId})
         if(prevAttachPath !== ""){
             return res.redirect(`/data/${prevAttachPath}/delete`)
         }

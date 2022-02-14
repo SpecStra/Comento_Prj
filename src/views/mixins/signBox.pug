@@ -21,7 +21,7 @@ mixin signBox(signType, currentCompany, joinType)
                 div.login_form_provision
                     div.login_form_text
                         i(class="bx bx-code icon")
-                    input.login_form_input(name="signCode" value="" required)
+                    input.login_form_input(name="signCode" value="" required minlength=12 maxlength=12)
                 if(joinType === "workshop")
                     div Choice company you belong to
                     select(name="upperChoice" class="login_form_provision")

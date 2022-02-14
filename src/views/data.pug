@@ -4,18 +4,18 @@ include mixins/pages
 include mixins/sortBox
 
 block content
-    if (dataFrame[0])
+    if (dataFrame)
         div.tableTop
             table
                 thead
                     tr
                         th
                             input(type="checkbox")
-                        th 사업장명
-                        th 사업자등록번호
-                        th 사업장 업종
-                        th 세부정보
-                        th 엑셀파일
+                        th Workshop Name
+                        th Result Year
+                        th Result Quarter
+                        th Detailed
+                        th File
 
                 each data in dataFrame
                     +company(data)
@@ -28,7 +28,9 @@ block content
             +pages(page, queryString)
 
 
-    //div.oath_box
-        a(href="/data/add") Add Data
+    a(href="/data/add" class="add_link")
+        div.add_Box
+            button.add_text add Data
+
     //div.sort_box
         +sortBox(pickQuery)

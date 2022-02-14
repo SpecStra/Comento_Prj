@@ -4,17 +4,37 @@ block content
     form(method="POST" enctype="multipart/form-data" class="file_add_form")
         if(detailed)
             div.form_text_container
-                div.fomr_text_bigtext Edit File
+                div.fomr_text_bigtext Edit File of #{detailed.financeInfo.recodedDate.year}/#{detailed.financeInfo.recodedDate.quarter}
             div.form_text_container
-                div.form_text_smalltext Current File
+                div.form_text_smalltext Current File : &nbsp;
                 div.form_text_smalltext #{detailed.attach.name ? detailed.attach.name : "없음"}
+            div.form_text_container
         else
             div.form_text_container
                 div.form_text_smalltext To enroll workplace, upload xlsx file.
-
+            span Select Results Period
+            div.date_Container
+                select(name="input_year" class="date_Input" required)
+                    option(name="2011" value="2011") 2011
+                    option(name="2012" value="2012") 2012
+                    option(name="2013" value="2013") 2013
+                    option(name="2014" value="2014") 2014
+                    option(name="2015" value="2015") 2015
+                    option(name="2016" value="2016") 2016
+                    option(name="2017" value="2017") 2017
+                    option(name="2018" value="2018") 2018
+                    option(name="2019" value="2019") 2019
+                    option(name="2020" value="2020") 2020
+                    option(name="2021" value="2021") 2021
+                    option(name="2022" value="2022") 2022
+                select(name="input_quarter" class="date_Input" required)
+                    option(name="quarter_1" value="1") First Quarter
+                    option(name="quarter_2" value="2") Second Quarter
+                    option(name="quarter_3" value="3") Third Quarter
+                    option(name="quarter_4" value="4") Fourth Quarter
         div.form_attach
             div.form_attach_attachCont
                 label.form_attach_label(for="attach")
-                input(name="attach" type="file" accept=".csv, .xlsx" class="form_attach_input")
+                input(name="attach" type="file" accept=".xlsx" class="form_attach_input")
 
             input(type="submit", value=`${ detailed ? "Edit" : "Submit" }` class="form_submit")
