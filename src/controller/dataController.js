@@ -3,6 +3,10 @@ import * as fs from "fs";
 import * as xlsx from "xlsx";
 import User from "../model/User";
 import mongoose from "mongoose";
+import fse from "fs-extra";
+import {zip} from "zip-a-folder";
+
+const tempFolder = "./uploads/temp"
 
 export const getData = async (req, res) => {
     try {
@@ -68,8 +72,32 @@ export const getDataPage = async (req, res) => {
 
         }
     } catch (e) {
-        return res.redirect("/")
+        return res.redirect("/data")
     }
+}
+
+export const postDataPages = async (req, res) => {
+    fse.emptyDirSync(tempFolder)
+    const downArray = Object.keys( req.body )
+    // console.log(downArray)
+    if(downArray.length === 0){
+        return res.status(400).redirect("/data/pages/1/")
+    }
+    try {
+        for(const src of downArray){
+            const queryId = new mongoose.Types.ObjectId( src )
+            const foundData = await Company.findOne( {_id: queryId} )
+            const fileName = `${ foundData.name } ${ foundData.financeInfo.recodedDate.year }년 ${ foundData.financeInfo.recodedDate.quarter }분기.xlsx`
+            const input = await fs.createReadStream( foundData.attach.path )
+            const output = await fs.createWriteStream( `${tempFolder}/${fileName}` )
+            input.pipe( output )
+        }
+    } catch (e) {
+        console.log(e)
+        return res.redirect("/data")
+    }
+    await zip( `${ tempFolder }`, "./uploads/masterData.zip" )
+    return res.download("./uploads/masterData.zip", "masterData.zip")
 }
 
 export const getDataDetails = async (req, res) => {
@@ -138,11 +166,6 @@ export const postDataAdd = async (req, res) => {
                 user : String(maker)
             },
             path : user.upperCompany === "Admin" ? ",Admin," : `,Admin,${user.upperCompany},`,
-            pastSales : {
-                last_quarter : 0,
-                sec_quarter : 0,
-                trd_quarter : 0
-            },
             attach : {
                 path : req.file ? req.file.path : "",
                 name : req.file ? req.file.originalname : ""
@@ -212,7 +235,7 @@ export const postDataEdit = async (req, res) => {
     const queryId = new mongoose.Types.ObjectId(objectID)
     const file = req.file
     const nowDate = new Date
-    const maker = req.session.currentUser.username
+    console.log(req.session.currentUser.username)
     const user = await User.findOne({registerCode : req.session.currentUser.registerCode})
     const prevData = await Company.findOne({_id : queryId})
     try{
@@ -221,7 +244,7 @@ export const postDataEdit = async (req, res) => {
         await fs.unlinkSync(`${prevData.attach.path}`)
         await Company.findOneAndUpdate({_id : queryId}, {
             name : Sheet1.A2.v,
-            registerCode : req.session.currentUser.registerCode,
+            registerCode : prevData.registerCode,
             category : Sheet1.B2.v,
             financeInfo : {
                 sales : Number(Sheet1.F2.v),
@@ -237,14 +260,9 @@ export const postDataEdit = async (req, res) => {
             postcode : Sheet1.E2.v,
             modifier : {
                 date : `${nowDate.getFullYear()}년 ${nowDate.getMonth()+1}월 ${nowDate.getDate()}일`,
-                user : String(maker)
+                user : String(req.session.currentUser.username)
             },
-            path : user.upperCompany === "Admin" ? ",Admin," : `,Admin,${user.upperCompany},`,
-            pastSales : {
-                last_quarter : 0,
-                sec_quarter : 0,
-                trd_quarter : 0
-            },
+            path : prevData.path,
             attach : {
                 path : req.file ? req.file.path : "",
                 name : req.file ? req.file.originalname : ""
@@ -313,4 +331,31 @@ export const getAttachDelete = async (req, res) => {
     } catch (e) {
         return res.status(500).redirect("/data/pages/1/")
     }
+}
+
+export const getDownloadAllData = async (req, res) => {
+    fse.emptyDirSync(tempFolder)
+    if(!res.locals.loggedIn){
+        req.session.userAuthFail = true
+        return res.status(200).redirect("/login")
+    }
+    const currentUser = req.session.currentUser.username
+    const user = await User.findOne({username : currentUser})
+    try{
+        const regexString = user.userType === "Admin" ? "^,Admin," : user.userType === "Company" ? `,${user.registerCode},` : `,Admin,${user.upperCompany},`
+        const regex = new RegExp(regexString, "g")
+        const companies = await Company.find({path : regex}).sort({name : 1, "financeInfo.recodedDate.year" : 1, "financeInfo.recodedDate.quarter" : 1})
+        for(const src of companies) {
+            const queryId = new mongoose.Types.ObjectId( src )
+            const foundData = await Company.findOne( {_id: queryId} )
+            const fileName = `${ foundData.name } ${ foundData.financeInfo.recodedDate.year }년 ${ foundData.financeInfo.recodedDate.quarter }분기.xlsx`
+            const input = await fs.createReadStream( foundData.attach.path )
+            const output = await fs.createWriteStream( `${ tempFolder }/${ fileName }` )
+            input.pipe( output )
+        }
+    } catch (e) {
+        return res.redirect("/data/pages/1/")
+    }
+    await zip( `${ tempFolder }`, "./uploads/AllData.zip" )
+    return res.download("./uploads/AllData.zip", "AllData.zip")
 }

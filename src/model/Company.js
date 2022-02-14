@@ -22,11 +22,6 @@ const companySchema = new mongoose.Schema({
         user : {type : String, required : true},
     },
     path : {type : String, required : true, trim : true},
-    pastSales : {
-        last_quarter : {type : Number},
-        sec_quarter : {type : Number},
-        trd_quarter : {type : Number},
-    },
     attach : {
         path : {type : String},
         name : {type : String}

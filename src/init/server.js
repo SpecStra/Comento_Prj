@@ -30,6 +30,9 @@ app.use(localWare)
 app.use("/", rootRouter)
 app.use("/user", userRouter)
 app.use("/data", dataRouter)
+app.use((req, res, next) => {
+    res.status(404).render("404", {message : "Hey, you've got a wrong way."})
+})
 
 const handleServerListening = () => {
     console.log(`✔ Server listening on port http://localhost:${PORT}`)

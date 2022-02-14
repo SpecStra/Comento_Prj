@@ -526,6 +526,7 @@ table tr:nth-child(even) {
   background-color: var(--primary-color);
   transition: var(--tran-02);
   cursor: pointer;
+  margin-right: 10px;
 }
 .detailed_button:hover{
   background-color: #f44e4e;
@@ -553,12 +554,12 @@ table tr:nth-child(even) {
   outline: none;
   border-radius: 10px;
   background-color: var(--primary-color);
-  margin-top: 25px;
   transition: var(--tran-02);
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
+  margin: 25px 10px 0 10px;
 }
 .add_Box:hover{
   background-color: #57e35a;
@@ -574,6 +575,32 @@ table tr:nth-child(even) {
   border: none;
   background: none;
   cursor: pointer;
+}
+
+.checkbox{
+  width: 350px;
+  min-width: 350px;
+  font-size: 15px;
+  border: 1px solid black;
+  border-radius: 10px;
+  padding: 5px;
+  background-color: var(--primary-color-light);
+  margin-bottom: 25px;
+}
+.checkbox i {
+  margin-right: 10px;
+}
+.checkbox input {
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+.multi_box{
+  width: 100%;
+  display: flex;
+  justify-content: right;
+  align-items: center;
 }
 
 /* ===== dataAddNew ===== */

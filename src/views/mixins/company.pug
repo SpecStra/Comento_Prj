@@ -3,7 +3,7 @@ mixin company(companyInfo)
     tbody
         tr
             td
-                input(type="checkbox")
+                input(type="checkbox" name=`${companyInfo._id}`)
             td #{companyInfo.name}
             td #{companyInfo.financeInfo.recodedDate.year}
             td #{companyInfo.financeInfo.recodedDate.quarter} Quarter

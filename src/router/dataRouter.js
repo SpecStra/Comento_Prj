@@ -8,17 +8,20 @@ import {
     getDataDownload,
     getDataEdit,
     getDataPage,
+    getDownloadAllData,
     postDataAdd,
-    postDataEdit
+    postDataEdit,
+    postDataPages
 } from "../controller/dataController";
 import {uploadWare} from "../init/sessionCatcher";
 
 const dataRouter = express.Router()
 
 dataRouter.get("/", getData)
-dataRouter.get("/pages/:page([0-9]{1,3})", getDataPage)
-dataRouter.get("/pages/:page([0-9]{1,3}/:mode)", getDataPage)
+dataRouter.route("/pages/:page([0-9]{1,3})").get(getDataPage).post(postDataPages)
+dataRouter.route("/pages/:page([0-9]{1,3}/:mode)").get(getDataPage).post(postDataPages)
 dataRouter.route("/add").get(getDataAdd).post(uploadWare.single("attach"), postDataAdd)
+dataRouter.get("/downloadAll", getDownloadAllData)
 dataRouter.get("/:objectID", getDataDetails)
 dataRouter.route("/:objectID/edit").get(getDataEdit).post(uploadWare.single("attach"), postDataEdit)
 dataRouter.get("/:objectID/delete", getDataDelete)

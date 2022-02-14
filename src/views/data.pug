@@ -5,32 +5,37 @@ include mixins/sortBox
 
 block content
     if (dataFrame)
-        div.tableTop
-            table
-                thead
-                    tr
-                        th
-                            input(type="checkbox")
-                        th Workshop Name
-                        th Result Year
-                        th Result Quarter
-                        th Detailed
-                        th File
+        form(method="POST")
+            div.checkbox
+                i(class="bx bx-purchase-tag-alt icon")
+                input.login_sign_input(type="submit" value="Download Checked Data as ZIP")
+            div.tableTop
+                table
+                    thead
+                        tr
+                            th
+                            th Workshop Name
+                            th Result Year
+                            th Result Quarter
+                            th Detailed
+                            th File
 
-                each data in dataFrame
-                    +company(data)
-                else
-                    li There's something wrong in data, sorry;
+                    each data in dataFrame
+                        +company(data)
+                    else
+                        li There's something wrong in data, sorry;
     else
         h2 there is no data;
     if(page)
         div.pageContainer
             +pages(page, queryString)
-
-
-    a(href="/data/add" class="add_link")
-        div.add_Box
-            button.add_text add Data
+    div.multi_box
+        a(href="/data/add" class="add_link")
+            div.add_Box
+                button.add_text add Data
+        a(href="/data/downloadAll" class="add_link")
+            div.add_Box
+                button.add_text 모든 데이터<br>압축 후 다운
 
     //div.sort_box
         +sortBox(pickQuery)

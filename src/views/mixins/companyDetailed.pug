@@ -25,7 +25,7 @@ mixin companyDetailed(companyInfo)
                 div.detailed_text_small 당기순이익
                 div.detailed_text #{companyInfo.financeInfo.netIncome.toLocaleString( "ko-KR" )}
             div.detailed_date
-                div.detailed_text_small 최근 수정일
+                div.detailed_text_small 최근 수정일  |  수정자 : #{companyInfo.modifier.user}
                 div.detailed_text #{companyInfo.modifier.date}
 
         div.detailed_leftbot
