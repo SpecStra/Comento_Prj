@@ -13,7 +13,7 @@ export const getData = async (req, res) => {
         const companies = await Company.find({})
         return res.render("data", {dataFrame : companies, pageTitle : "Data"})
     } catch (e) {
-        console.log(e)
+        //console.log(e)
         return res.status(400).render("data", {message : e, pageTitle : "Data"})
     }
 }
@@ -30,22 +30,22 @@ export const getDataPage = async (req, res) => {
         }
     }
     const page = req.params.page ? req.params.page : 1
-    const pickQuery = req.query ? req.query : null
+    // const pickQuery = req.query ? req.query : null
     const currentUser = req.session.currentUser.username
     const user = await User.findOne({username : currentUser})
-    //console.log(user.registerCode)
-    const viewRate = 50
+    // console.log(user.registerCode)
+    const viewRate = 30
     const countOfData = await Company.count({})
     const lastPage = countOfData%viewRate === 0 ? countOfData/viewRate : Math.ceil(countOfData/viewRate)
     try{
-        if(!pickQuery.sort && !pickQuery.allSort){
-            const regexString = user.userType === "Admin" ? "^,Admin," : user.userType === "Company" ? `,${user.registerCode},` : `,Admin,${user.upperCompany},`
-            const regex = new RegExp(regexString, "g")
-            // console.log(regex)
-            const companies = await Company.find({path : regex}).skip((page-1)*viewRate).limit(viewRate).sort({name : 1, "financeInfo.recodedDate.year" : 1, "financeInfo.recodedDate.quarter" : 1})
-            return res.render("data", {dataFrame : companies, pageTitle : `Data - Page ${page}`, page : Number(page), lastPage})
-
-        } else if(pickQuery.sort && !pickQuery.allSort) {
+        //if(!pickQuery.sort && !pickQuery.allSort
+        const regexString = user.userType === "Admin" ? "^,Admin," : user.userType === "Company" ? `,${user.registerCode},` : `,Admin,${user.upperCompany},`
+        const regex = new RegExp(regexString, "g")
+        // console.log(regex)
+        const companies = await Company.find({path : regex}).skip((page-1)*viewRate).limit(viewRate).sort({name : 1, "financeInfo.recodedDate.year" : 1, "financeInfo.recodedDate.quarter" : 1})
+        return res.render("data", {dataFrame : companies, pageTitle : `Data - Page ${page}`, page : Number(page), lastPage})
+        /*
+        else if(pickQuery.sort && !pickQuery.allSort) {
             const companies = await Company.find({}).skip((page-1)*viewRate).limit(viewRate)
             if(pickQuery.sort === "asc"){
                 companies.sort((a,b) => a.sales > b.sales ? 1 : -1)
@@ -69,8 +69,8 @@ export const getDataPage = async (req, res) => {
             }
             const queryString = `?allSort=${pickQuery.allSort}&sort=${pickQuery.sort}`
             return res.render("data", {dataFrame : companies, pageTitle : `Data - Page ${page}`, page : Number(page), lastPage, pickQuery, queryString})
-
         }
+         */
     } catch (e) {
         return res.redirect("/data")
     }
@@ -93,7 +93,7 @@ export const postDataPages = async (req, res) => {
             input.pipe( output )
         }
     } catch (e) {
-        console.log(e)
+        //console.log(e)
         return res.redirect("/data")
     }
     await zip( `${ tempFolder }`, "./uploads/masterData.zip" )
@@ -114,15 +114,26 @@ export const getDataDetails = async (req, res) => {
         }
         return res.render("dataDetail", {detailed, pageTitle : `Data Detailed`})
     } catch (e) {
-        console.log(e)
+        //console.log(e)
         return res.status(400).render("data", {message : e, pageTitle : `Data Detailed`})
     }
 }
 
-export const getDataAdd = (req, res) => {
+export const getDataAdd = async (req, res) => {
     if(!res.locals.loggedIn){
         req.session.userAuthFail = true
         return res.status(200).redirect("/login")
+    }
+    if(res.locals.userType !== "Workshop"){
+        const user = await User.findOne({username : res.locals.currentUser})
+        const lowerUser = await User.find({upperCompany : user.registerCode})
+        const dataLength = Object.keys(lowerUser).length
+        const users = []
+        for (const i of Array(dataLength).keys()) {
+            users.push(lowerUser[i].workshopName)
+        }
+        console.log(users)
+        return res.render("dataAddNew", {pageTitle : "Data Add", lowerUser : users})
     }
     return res.render("dataAddNew", {pageTitle : "Data Add"})
 }
@@ -134,82 +145,95 @@ export const postDataAdd = async (req, res) => {
     }
     const file = req.file
     const nowDate = new Date
-    const {input_year, input_quarter} = req.body
-    const check = await Company.findOne({registerCode : req.session.currentUser.registerCode, "financeInfo.recodedDate.year" : Number(input_year), "financeInfo.recodedDate.quarter" : Number(input_quarter)})
-    if(check){
-        await fs.unlinkSync(file.path)
-        return res.status(400).render("dataAddNew", {message : `${input_year}/${input_quarter} quarter Data already exist`, pageTitle : "Data Add"})
-    }
+    const {input_year, input_quarter, lowerusers} = req.body
     const maker = req.session.currentUser.username
-    try{
-        const user = await User.findOne({username : maker})
-        const obj = await xlsx.readFile(`./uploads/${file.filename}`)
-        const {Sheets : {Sheet1}} = obj
-        const newCompany = await Company.create({
-            name : Sheet1.A2.v,
-            registerCode : user.registerCode,
-            category : Sheet1.B2.v,
-            financeInfo : {
-                sales : Number(Sheet1.F2.v),
-                operIncome : Number(Sheet1.G2.v),
-                netIncome : Number(Sheet1.H2.v),
-                recodedDate : {
-                    year : Number(input_year),
-                    quarter : Number(input_quarter),
+    console.log(lowerusers)
+    if(!lowerusers){
+        const check = await Company.findOne({registerCode : req.session.currentUser.registerCode, "financeInfo.recodedDate.year" : Number(input_year), "financeInfo.recodedDate.quarter" : Number(input_quarter)})
+        if(check){
+            await fs.unlinkSync(file.path)
+            return res.status(400).render("dataAddNew", {message : `${input_year}/${input_quarter} quarter Data already exist`, pageTitle : "Data Add"})
+        }
+        try{
+            const user = await User.findOne({username : maker})
+            const obj = await xlsx.readFile(`./uploads/${file.filename}`)
+            const {Sheets : {Sheet1}} = obj
+            const newCompany = await Company.create({
+                name : lowerusers ? lowerusers : user.workshopName,
+                registerCode : user.registerCode,
+                category : Sheet1.B2.v,
+                financeInfo : {
+                    sales : Number(Sheet1.F2.v),
+                    operIncome : Number(Sheet1.G2.v),
+                    netIncome : Number(Sheet1.H2.v),
+                    recodedDate : {
+                        year : Number(input_year),
+                        quarter : Number(input_quarter),
+                    }
+                },
+                categoryCode : Sheet1.C2.v,
+                isPrivate : Boolean(Sheet1.D2.v),
+                modifier : {
+                    date : `${nowDate.getFullYear()}년 ${nowDate.getMonth()+1}월 ${nowDate.getDate()}일`,
+                    user : String(maker)
+                },
+                path : user.upperCompany === "Admin" ? ",Admin," : `,Admin,${user.upperCompany},`,
+                attach : {
+                    path : req.file ? req.file.path : "",
+                    name : req.file ? req.file.originalname : ""
                 }
-            },
-            categoryCode : Sheet1.C2.v,
-            isPrivate : Boolean(Sheet1.D2.v),
-            postcode : Sheet1.E2.v,
-            modifier : {
-                date : `${nowDate.getFullYear()}년 ${nowDate.getMonth()+1}월 ${nowDate.getDate()}일`,
-                user : String(maker)
-            },
-            path : user.upperCompany === "Admin" ? ",Admin," : `,Admin,${user.upperCompany},`,
-            attach : {
-                path : req.file ? req.file.path : "",
-                name : req.file ? req.file.originalname : ""
+            })
+            return res.redirect(`/data/${newCompany._id.toString()}`)
+        } catch (e) {
+            // console.log(e)
+            return res.status(400).render("dataAddNew", {message : e, pageTitle : "Data Add"})
+        }
+    } else {
+        const thatUser = await User.findOne({workshopName : lowerusers})
+        const check = await Company.findOne({registerCode : thatUser.registerCode, "financeInfo.recodedDate.year" : Number(input_year), "financeInfo.recodedDate.quarter" : Number(input_quarter)})
+        if(check){
+            await fs.unlinkSync(file.path)
+            const lowerUser = await User.find({upperCompany : res.locals.userRegiCode})
+            const dataLength = Object.keys(lowerUser).length
+            const users = []
+            for (const i of Array(dataLength).keys()) {
+                users.push(lowerUser[i].workshopName)
             }
-        })
-        return res.redirect(`/data/${newCompany._id.toString()}`)
-    /*
-    const {name,
-        registerCode,
-        category,
-        sales,
-        categoryCode,
-        isPrivate,
-        postcode,
-        last_quarter,
-        sec_quarter,
-        trd_quarter,
-        attach} = req.body
-    const nowDate = new Date
-    try {
-        const newCompany = await Company.create({
-            name,
-            registerCode,
-            category,
-            sales : Number(sales),
-            categoryCode,
-            isPrivate : privateValidate(isPrivate),
-            postcode,
-            createdAt : `${nowDate.getFullYear()}년 ${nowDate.getMonth()+1}월 ${nowDate.getDate()}일`,
-            pastSales : {
-                last_quarter : Number(last_quarter),
-                sec_quarter : Number(sec_quarter),
-                trd_quarter : Number(trd_quarter)
-            },
-            attach : {
-                path : req.file ? req.file.path : "",
-                name : req.file ? req.file.originalname : ""
-            }
-        })
-        return res.redirect(`/data/${newCompany.registerCode}`)
-        */
-    } catch (e) {
-        // console.log(e)
-        return res.status(400).render("dataAddNew", {message : e, pageTitle : "Data Add"})
+            return res.status(400).render("dataAddNew", {message : `${input_year}/${input_quarter} quarter Data already exist`, pageTitle : "Data Add", lowerUser : users})
+        }
+        try{
+            const obj = await xlsx.readFile(`./uploads/${file.filename}`)
+            const {Sheets : {Sheet1}} = obj
+            const newCompany = await Company.create({
+                name : thatUser.workshopName,
+                registerCode : thatUser.registerCode,
+                category : Sheet1.B2.v,
+                financeInfo : {
+                    sales : Number(Sheet1.F2.v),
+                    operIncome : Number(Sheet1.G2.v),
+                    netIncome : Number(Sheet1.H2.v),
+                    recodedDate : {
+                        year : Number(input_year),
+                        quarter : Number(input_quarter),
+                    }
+                },
+                categoryCode : Sheet1.C2.v,
+                isPrivate : Boolean(Sheet1.D2.v),
+                modifier : {
+                    date : `${nowDate.getFullYear()}년 ${nowDate.getMonth()+1}월 ${nowDate.getDate()}일`,
+                    user : String(maker)
+                },
+                path : thatUser.upperCompany === "Admin" ? ",Admin," : `,Admin,${thatUser.upperCompany},`,
+                attach : {
+                    path : req.file ? req.file.path : "",
+                    name : req.file ? req.file.originalname : ""
+                }
+            })
+            return res.redirect(`/data/${newCompany._id.toString()}`)
+        } catch (e) {
+            // console.log(e)
+            return res.status(400).render("dataAddNew", {message : e, pageTitle : "Data Add"})
+        }
     }
 }
 
@@ -235,15 +259,13 @@ export const postDataEdit = async (req, res) => {
     const queryId = new mongoose.Types.ObjectId(objectID)
     const file = req.file
     const nowDate = new Date
-    console.log(req.session.currentUser.username)
-    const user = await User.findOne({registerCode : req.session.currentUser.registerCode})
     const prevData = await Company.findOne({_id : queryId})
     try{
         const obj = await xlsx.readFile(`./uploads/${file.filename}`)
         const {Sheets : {Sheet1}} = obj
         await fs.unlinkSync(`${prevData.attach.path}`)
         await Company.findOneAndUpdate({_id : queryId}, {
-            name : Sheet1.A2.v,
+            name : prevData.workshopName,
             registerCode : prevData.registerCode,
             category : Sheet1.B2.v,
             financeInfo : {
@@ -257,7 +279,6 @@ export const postDataEdit = async (req, res) => {
             },
             categoryCode : Sheet1.C2.v,
             isPrivate : Boolean(Sheet1.D2.v),
-            postcode : Sheet1.E2.v,
             modifier : {
                 date : `${nowDate.getFullYear()}년 ${nowDate.getMonth()+1}월 ${nowDate.getDate()}일`,
                 user : String(req.session.currentUser.username)
@@ -303,7 +324,7 @@ export const getDataDownload = async (req, res) => {
     const {file_path} = req.params
     const searched = await Company.findOne({"attach.path" : `uploads\\${file_path}`})
     try{
-        return res.download(`./uploads/${file_path}`, `${searched.attach.name}`)
+        return res.download(`./uploads/${file_path}`, `${ searched.financeInfo.recodedDate.year }년 ${ searched.financeInfo.recodedDate.quarter }분기.xlsx`)
     } catch (e) {
         return res.render(`/data/${searched.registerCode}`, {message : e})
     }

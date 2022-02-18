@@ -1,4 +1,5 @@
 extends base/base
+include mixins/userOption
 
 block content
     form(method="POST" enctype="multipart/form-data" class="file_add_form")
@@ -12,6 +13,13 @@ block content
         else
             div.form_text_container
                 div.form_text_smalltext To enroll workplace, upload xlsx file.
+            if(lowerUser)
+                span Select workshop to enroll
+                div.date_Container_BIG
+                    select(name="lowerusers" class="date_Input_BIG" required)
+                        each data in lowerUser
+                            option(name=`${ data }` value=`${ data }`) #{data}
+
             span Select Results Period
             div.date_Container
                 select(name="input_year" class="date_Input" required)

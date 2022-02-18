@@ -22,7 +22,17 @@ mixin signBox(signType, currentCompany, joinType)
                     div.login_form_text
                         i(class="bx bx-code icon")
                     input.login_form_input(name="signCode" value="" required minlength=12 maxlength=12)
+                span Postcode
+                div.login_form_provision
+                    div.login_form_text
+                        i(class="bx bx-code post")
+                    input.login_form_input(name="postcode" value="" required minlength=5 maxlength=5)
                 if(joinType === "workshop")
+                    span Workshop Name
+                    div.login_form_provision
+                        div.login_form_text
+                            i(class="bx bx-user-pin icon")
+                        input.login_form_input(name="workshopName" value="" required minlength=2 maxlength=12)
                     div Choice company you belong to
                     select(name="upperChoice" class="login_form_provision")
                         each data in currentCompany

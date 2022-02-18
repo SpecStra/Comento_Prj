@@ -16,7 +16,6 @@ const companySchema = new mongoose.Schema({
     },
     categoryCode : {type : String, required : true, trim : true, validate : {validator : valiContainer.ValidateCode.validator, message : valiContainer.ValidateCode.message.category}},
     isPrivate : {type : Boolean, required : true},
-    postcode : {type : String, required : true, trim : true, validate : {validator : valiContainer.ValidatePost.validator, message : valiContainer.ValidatePost.message}},
     modifier : {
         date : {type : String, required : true},
         user : {type : String, required : true},

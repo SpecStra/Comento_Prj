@@ -45,7 +45,7 @@ export const getJoin = async (req, res) => {
 }
 
 export const postJoin = async (req, res) => {
-    const {username, password, passwordRecheck, signCode} = req.body
+    const {username, password, passwordRecheck, signCode, postcode} = req.body
     const searchedName = await User.findOne({username})
     if(searchedName){
         return res.status(400).render("join", {message : "that name is already exist", pageTitle : "Join"})
@@ -60,6 +60,7 @@ export const postJoin = async (req, res) => {
     await User.create({
         username,
         password,
+        postcode,
         registerCode : signCode,
         upperCompany : "Admin",
         userType : "Company"
@@ -69,6 +70,9 @@ export const postJoin = async (req, res) => {
 
 export const getJoinWorkshop = async (req, res) => {
     const currentCompany = await User.find({upperCompany : "Admin"})
+    if(!currentCompany[0]){
+        return res.render("joinGate", {pageTitle : "Join", message : "There's no company registered right now."})
+    }
     const dataLength = Object.keys(currentCompany).length
     const users = []
     for (const i of Array(dataLength).keys()) {
@@ -78,7 +82,7 @@ export const getJoinWorkshop = async (req, res) => {
 }
 
 export const postJoinWorkshop = async (req, res) => {
-    const {username, password, passwordRecheck, signCode, upperChoice} = req.body
+    const {username, password, passwordRecheck, signCode, workshopName, upperChoice, postcode} = req.body
     const searchedName = await User.findOne({username})
     if(searchedName){
         return res.status(400).render("join", {message : "that name is already exist", pageTitle : "Join"})
@@ -93,6 +97,8 @@ export const postJoinWorkshop = async (req, res) => {
     const upperUser = await User.findOne({username : upperChoice})
     await User.create({
         username,
+        workshopName,
+        postcode,
         password,
         registerCode : signCode,
         upperCompany : upperUser.registerCode,
