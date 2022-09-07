@@ -41,8 +41,9 @@ mixin signBox(signType, currentCompany, joinType)
                 input.login_sign_input(type="submit" value=`${ signType }`)
         div.sign_box
             if(signType === "Sign On")
-                div.sing_box_child
-                    a(href="/login") To Log in
+                a(href="/login")
+                    div.sing_box_child To Log in
+
             if(signType === "Log in")
                 div.sing_box_child
                     a(href="/join") To Sign On

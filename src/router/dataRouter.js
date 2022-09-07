@@ -12,8 +12,8 @@ import {
     postDataAdd,
     postDataEdit,
     postDataPages
-} from "../controller/dataController";
-import {uploadWare} from "../init/sessionCatcher";
+} from "../controller/dataController.js";
+import {uploadWare} from "../init/sessionCatcher.js";
 
 const dataRouter = express.Router()
 

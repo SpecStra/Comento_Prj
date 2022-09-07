@@ -1,7 +1,7 @@
-import Company from "../model/Company";
+import Company from "../model/Company.js";
 import * as fs from "fs";
 import * as xlsx from "xlsx";
-import User from "../model/User";
+import User from "../model/User.js";
 import mongoose from "mongoose";
 import fse from "fs-extra";
 import {zip} from "zip-a-folder";
@@ -124,6 +124,9 @@ export const getDataAdd = async (req, res) => {
         req.session.userAuthFail = true
         return res.status(200).redirect("/login")
     }
+    if(res.locals.userType === "Admin"){
+        return res.status(200).redirect("/data/pages/1/")
+    }
     if(res.locals.userType !== "Workshop"){
         const user = await User.findOne({username : res.locals.currentUser})
         const lowerUser = await User.find({upperCompany : user.registerCode})
@@ -132,7 +135,6 @@ export const getDataAdd = async (req, res) => {
         for (const i of Array(dataLength).keys()) {
             users.push(lowerUser[i].workshopName)
         }
-        console.log(users)
         return res.render("dataAddNew", {pageTitle : "Data Add", lowerUser : users})
     }
     return res.render("dataAddNew", {pageTitle : "Data Add"})
@@ -161,18 +163,18 @@ export const postDataAdd = async (req, res) => {
             const newCompany = await Company.create({
                 name : lowerusers ? lowerusers : user.workshopName,
                 registerCode : user.registerCode,
-                category : Sheet1.B2.v,
+                category : Sheet1.A2.v,
                 financeInfo : {
-                    sales : Number(Sheet1.F2.v),
-                    operIncome : Number(Sheet1.G2.v),
-                    netIncome : Number(Sheet1.H2.v),
+                    sales : Number(Sheet1.D2.v),
+                    operIncome : Number(Sheet1.E2.v),
+                    netIncome : Number(Sheet1.F2.v),
                     recodedDate : {
                         year : Number(input_year),
                         quarter : Number(input_quarter),
                     }
                 },
-                categoryCode : Sheet1.C2.v,
-                isPrivate : Boolean(Sheet1.D2.v),
+                categoryCode : Sheet1.B2.v,
+                isPrivate : Boolean(Sheet1.C2.v),
                 modifier : {
                     date : `${nowDate.getFullYear()}년 ${nowDate.getMonth()+1}월 ${nowDate.getDate()}일`,
                     user : String(maker)
@@ -207,18 +209,18 @@ export const postDataAdd = async (req, res) => {
             const newCompany = await Company.create({
                 name : thatUser.workshopName,
                 registerCode : thatUser.registerCode,
-                category : Sheet1.B2.v,
+                category : Sheet1.A2.v,
                 financeInfo : {
-                    sales : Number(Sheet1.F2.v),
-                    operIncome : Number(Sheet1.G2.v),
-                    netIncome : Number(Sheet1.H2.v),
+                    sales : Number(Sheet1.D2.v),
+                    operIncome : Number(Sheet1.E2.v),
+                    netIncome : Number(Sheet1.F2.v),
                     recodedDate : {
                         year : Number(input_year),
                         quarter : Number(input_quarter),
                     }
                 },
-                categoryCode : Sheet1.C2.v,
-                isPrivate : Boolean(Sheet1.D2.v),
+            categoryCode : Sheet1.B2.v,
+                isPrivate : Boolean(Sheet1.C2.v),
                 modifier : {
                     date : `${nowDate.getFullYear()}년 ${nowDate.getMonth()+1}월 ${nowDate.getDate()}일`,
                     user : String(maker)
@@ -267,18 +269,18 @@ export const postDataEdit = async (req, res) => {
         await Company.findOneAndUpdate({_id : queryId}, {
             name : prevData.workshopName,
             registerCode : prevData.registerCode,
-            category : Sheet1.B2.v,
+            category : Sheet1.A2.v,
             financeInfo : {
-                sales : Number(Sheet1.F2.v),
-                operIncome : Number(Sheet1.G2.v),
-                netIncome : Number(Sheet1.H2.v),
+                sales : Number(Sheet1.D2.v),
+                operIncome : Number(Sheet1.E2.v),
+                netIncome : Number(Sheet1.F2.v),
                 recodedDate : {
                     year : prevData.financeInfo.recodedDate.year,
                     quarter : prevData.financeInfo.recodedDate.quarter,
                 }
             },
-            categoryCode : Sheet1.C2.v,
-            isPrivate : Boolean(Sheet1.D2.v),
+            categoryCode : Sheet1.B2.v,
+            isPrivate : Boolean(Sheet1.C2.v),
             modifier : {
                 date : `${nowDate.getFullYear()}년 ${nowDate.getMonth()+1}월 ${nowDate.getDate()}일`,
                 user : String(req.session.currentUser.username)

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import {valiContainer} from "./validator"
+import {valiContainer} from "./validator.js"
 
 const companySchema = new mongoose.Schema({
     name : {type : String, required : true, trim : true,},

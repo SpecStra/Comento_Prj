@@ -1,13 +1,13 @@
 import express from "express"
 import session from "express-session"
-import rootRouter from "../router/rootRouter";
-import userRouter from "../router/userRouter";
-import dataRouter from "../router/dataRouter";
+import rootRouter from "../router/rootRouter.js";
+import userRouter from "../router/userRouter.js";
+import dataRouter from "../router/dataRouter.js";
 import bodyParser from "body-parser";
-import "./db"
-import "../model/Company"
-import "../model/User"
-import {localWare} from "./sessionCatcher";
+import "./db.js"
+import "../model/Company.js"
+import "../model/User.js"
+import {localWare} from "./sessionCatcher.js";
 
 const PORT = 5000
 

@@ -29,12 +29,13 @@ block content
         div.pageContainer
             +pages(page, queryString)
     div.multi_box
-        a(href="/data/add" class="add_link")
-            div.add_Box
-                button.add_text add Data
+        if(userType !== "Admin")
+            a(href="/data/add" class="add_link")
+                div.add_Box
+                    button.add_text add Data
         a(href="/data/downloadAll" class="add_link")
             div.add_Box
-                button.add_text 모든 데이터<br>압축 후 다운
+                button.add_text Download<br>All Data
 
     //div.sort_box
         +sortBox(pickQuery)

@@ -9,7 +9,7 @@ import {
     postJoin,
     postJoinWorkshop,
     postLogin
-} from "../controller/rootController";
+} from "../controller/rootController.js";
 
 const rootRouter = express.Router()
 
