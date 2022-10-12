@@ -1,6 +1,6 @@
 # Route
 #### /
-#### /user GET : get current user info
+#### /user/:id GET : get current user info
 #### /login GET POST : sign in
 #### /join GET POST : sign on
 #### /data GET POST : view whole data / download data as zip
