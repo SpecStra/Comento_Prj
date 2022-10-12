@@ -1,3 +1,14 @@
+# Route
+#### /
+#### /user GET : get current user info
+#### /login GET POST : sign in
+#### /join GET POST : sign on
+#### /data GET POST : view whole data / download data as zip
+#### /data/:id GET POST PUT DELETE : detailed data / upload xlsx file to make data
+
+
+
+
 # stack
 
 #### frontend : pug, scss
